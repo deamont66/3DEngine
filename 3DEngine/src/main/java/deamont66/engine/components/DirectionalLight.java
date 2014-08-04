@@ -42,7 +42,7 @@ public class DirectionalLight extends BaseLight
 		super(color, intensity);
 
 		setShader(new Shader("forward-directional"));		
-		setShadowInfo(new ShadowInfo(new Matrix4f().initOrthographic(-40, 40, -40, 40, -40, 40), true));
+		setShadowInfo(new ShadowInfo(new Matrix4f().initOrthographic(-40, 40, -40, 40, -40, 40), 3, true));
 	}
 
 	public Vector3f getDirection()

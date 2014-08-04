@@ -129,8 +129,8 @@ public class TextureResource extends ReferenceCounter {
             glDrawBuffers(drawBuffers[i]);
         }
         
-//        glDrawBuffer(GL_NONE);
-//	glReadBuffer(GL_NONE);
+        glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
         
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             new Exception("Framebuffer creations failure. Error Code: " + glCheckFramebufferStatus(GL_FRAMEBUFFER)).printStackTrace();

@@ -39,20 +39,22 @@ public class ShadowInfo {
 
     private final Matrix4f projection;
     private final boolean flipfaces;
-    private final float shadowSoftness;
-    private final float lightBleedReductionAmount;
-    private final float minVariance;
+    private final float bias;
+//    private final float shadowSoftness;
+//    private final float lightBleedReductionAmount;
+//    private final float minVariance;
 
     public ShadowInfo(Matrix4f projection, boolean flipFaces) {
-        this(projection, flipFaces, 1.0f, 0.2f, 0.00002f);
+        this(projection, 1f, flipFaces);
     }
     
-    public ShadowInfo(Matrix4f projection, boolean flipFaces, float shadowSoftness, float lightBleedReductionAmount, float minVariance) {
+    public ShadowInfo(Matrix4f projection, float bias, boolean flipFaces) {
         this.projection = projection;
         this.flipfaces = flipFaces;
-        this.shadowSoftness = shadowSoftness;
-        this.lightBleedReductionAmount = lightBleedReductionAmount;
-        this.minVariance = minVariance;
+        this.bias = bias;
+//        this.shadowSoftness = shadowSoftness;
+//        this.lightBleedReductionAmount = lightBleedReductionAmount;
+//        this.minVariance = minVariance;
     }
 
     public Matrix4f getProjection() {
@@ -63,15 +65,19 @@ public class ShadowInfo {
         return flipfaces;
     }
 
-    public float getShadowSoftness() {
-        return shadowSoftness;
-    }
+//    public float getShadowSoftness() {
+//        return shadowSoftness;
+//    }
+//
+//    public float getMinVariance() {
+//        return minVariance;
+//    }
+//
+//    public float getLightBleedReductionAmount() {
+//        return lightBleedReductionAmount;
+//    }
 
-    public float getMinVariance() {
-        return minVariance;
-    }
-
-    public float getLightBleedReductionAmount() {
-        return lightBleedReductionAmount;
+    public float getBias() {
+        return bias;
     }
 }
