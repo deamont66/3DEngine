@@ -31,9 +31,8 @@
 package deamont66.engine.core;
 
 import deamont66.engine.components.GameComponent;
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 import deamont66.engine.rendering.Shader;
-
 import java.util.ArrayList;
 
 public class GameObject
@@ -82,12 +81,12 @@ public class GameObject
 			child.updateAll(delta);
 	}
 
-	public void renderAll(Shader shader, RenderingEngine renderingEngine)
+	public void renderAll(Shader shader, Renderer renderer)
 	{
-		render(shader, renderingEngine);
+		render(shader, renderer);
 
 		for(GameObject child : children)
-			child.renderAll(shader, renderingEngine);
+			child.renderAll(shader, renderer);
 	}
 
 	public void input(float delta)
@@ -104,10 +103,10 @@ public class GameObject
 			component.update(delta);
 	}
 
-	public void render(Shader shader, RenderingEngine renderingEngine)
+	public void render(Shader shader, Renderer renderer)
 	{
 		for(GameComponent component : components)
-			component.render(shader, renderingEngine);
+			component.render(shader, renderer);
 	}
 
 	public ArrayList<GameObject> getAllAttached()

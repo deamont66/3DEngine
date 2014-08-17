@@ -27,129 +27,144 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.core;
 
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 import deamont66.engine.rendering.Window;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class CoreEngine
-{
-	private boolean isRunning;
-	private final Game game;
-	private RenderingEngine renderingEngine;
-	private final int width;
-	private final int height;
-	private final double frameTime;
-        private final boolean vsync;
-	
-	public CoreEngine(int width, int height, double framerate, boolean vsync, Game game)
-	{
-		this.isRunning = false;
-		this.game = game;
-		this.width = width;
-		this.height = height;
-		this.frameTime = 1.0/framerate;
-                this.vsync = vsync;
-                game.setEngine(this);
-	}
+public class CoreEngine {
 
-	public void createWindow(String title)
-	{
-		Window.createWindow(width, height, false, title);
-                Window.setVSyncEnabled(vsync);
-                if(Debug.DEBUG_ECHO) System.out.println("OpenGL version " + RenderingEngine.getOpenGLVersion());
-		this.renderingEngine = new RenderingEngine();
-	}
+    private boolean isRunning;
 
-	public void start()
-	{
-		if(isRunning)
-			return;
-		
-		run();
-	}
-	
-	public void stop()
-	{
-		if(!isRunning)
-			return;
-		
-		isRunning = false;
-	}
-	
-	private void run()
-	{
-		isRunning = true;
-		
-		int frames = 0;
-		long frameCounter = 0;
+    private Class<? extends Game> gameClass;
+    private Game game;
 
-		game.init();
+    private Class<? extends Renderer> rendererClass;
+    private Renderer renderer;
+    private final int width;
+    private final int height;
+    private final double frameTime;
+    private final boolean vsync;
 
-		double lastTime = Time.getTime();
-		double unprocessedTime = 0;
-		
-		while(isRunning)
-		{
-			boolean render = false;
+    public CoreEngine() {
+        this(640, 480, 60, false);
+    }
 
-			double startTime = Time.getTime();
-			double passedTime = startTime - lastTime;
-			lastTime = startTime;
-			
-			unprocessedTime += passedTime;
-			frameCounter += passedTime;
-			
-			while(unprocessedTime > frameTime)
-			{
-				render = true;
-				
-				unprocessedTime -= frameTime;
-				
-				if(Window.isCloseRequested())
-					stop();
+    public CoreEngine(int width, int height, double framerate, boolean vsync) {
+        this.isRunning = false;
+        this.width = width;
+        this.height = height;
+        this.frameTime = 1.0 / framerate;
+        this.vsync = vsync;
+    }
 
-				game.input((float)frameTime);
-				Input.update();
-				
-				game.update((float)frameTime);
-				
-				if(frameCounter >= 1.0)
-				{
-					System.out.println(frames);
-					frames = 0;
-					frameCounter = 0;
-				}
-			}
-			if(render)
-			{
-				game.render(renderingEngine);
-				Window.render();
-				frames++;
-			}
-			else
-			{
-				try
-				{
-					Thread.sleep(1);
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		cleanUp();
-	}
+    public void createWindow(String title) {
+        if (gameClass == null || rendererClass == null) {
+            throw new IllegalStateException("Game or Renderer not set.");
+        }
+        Window.createWindow(width, height, false, title);
+        Window.setVSyncEnabled(vsync);
+        try {
+            game = gameClass.newInstance();
+            game.setEngine(this);
+            renderer = rendererClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(CoreEngine.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
+        if (Debug.DEBUG_ECHO) {
+            System.out.println("Renderer version: " + renderer.getRenderVersion());
+        }
+    }
 
-	private void cleanUp()
-	{
-                Window.dispose();
-	}
+    public void start() {
+        if (isRunning) {
+            return;
+        }
 
-	public RenderingEngine getRenderingEngine() {
-		return renderingEngine;
-	}
+        run();
+    }
+
+    public void stop() {
+        if (!isRunning) {
+            return;
+        }
+
+        isRunning = false;
+    }
+
+    private void run() {
+        isRunning = true;
+
+        int frames = 0;
+        long frameCounter = 0;
+
+        game.init();
+
+        double lastTime = Time.getTime();
+        double unprocessedTime = 0;
+
+        while (isRunning) {
+            boolean render = false;
+
+            double startTime = Time.getTime();
+            double passedTime = startTime - lastTime;
+            lastTime = startTime;
+
+            unprocessedTime += passedTime;
+            frameCounter += passedTime;
+
+            while (unprocessedTime > frameTime) {
+                render = true;
+
+                unprocessedTime -= frameTime;
+
+                if (Window.isCloseRequested()) {
+                    stop();
+                }
+
+                game.input((float) frameTime);
+                Input.update();
+
+                game.update((float) frameTime);
+
+                if (frameCounter >= 1.0) {
+                    System.out.println(frames);
+                    frames = 0;
+                    frameCounter = 0;
+                }
+            }
+            if (render) {
+                game.render(renderer);
+                Window.render();
+                frames++;
+            } else {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        cleanUp();
+    }
+
+    private void cleanUp() {
+        Window.dispose();
+    }
+
+    public Renderer getRenderingEngine() {
+        return renderer;
+    }
+
+    public void setGame(Class<? extends Game> aClass) {
+        gameClass = aClass;
+    }
+
+    public void setRenderer(Class<? extends Renderer> aClass) {
+        rendererClass = aClass;
+    }
 }

@@ -88,9 +88,9 @@ public class Shader {
 		glUseProgram(resource.getProgram());
 	}
 
-	public void updateUniforms(Transform transform, Material material, RenderingEngine renderingEngine) {
+	public void updateUniforms(Transform transform, Material material, Renderer renderer) {
 		Matrix4f worldMatrix = transform.getTransformation();
-		Matrix4f MVPMatrix = renderingEngine.getMainCamera().getViewProjection().mul(worldMatrix);
+		Matrix4f MVPMatrix = renderer.getMainCamera().getViewProjection().mul(worldMatrix);
 
 		for (int i = 0; i < resource.getUniformNames().size(); i++) {
 			String uniformName = resource.getUniformNames().get(i);
@@ -99,27 +99,27 @@ public class Shader {
 			if (uniformName.startsWith("R_")) {
 				String unprefixedUniformName = uniformName.substring(2);
                                 if(unprefixedUniformName.equals("lightMatrix")) {
-                                    setUniform(uniformName, renderingEngine.getLightMatrix().mul(worldMatrix));
+                                    setUniform(uniformName, renderer.getLightMatrix().mul(worldMatrix));
                                 }
                                 else if (uniformType.equals("sampler2D")) {
-					int samplerSlot = renderingEngine.getSamplerSlot(unprefixedUniformName);
-					renderingEngine.getTexture(unprefixedUniformName).bind(samplerSlot);
+					int samplerSlot = renderer.getSamplerSlot(unprefixedUniformName);
+					renderer.getTexture(unprefixedUniformName).bind(samplerSlot);
 					setUniformi(uniformName, samplerSlot);
 				} else if (uniformType.equals("vec3")) {
-					setUniform(uniformName, renderingEngine.getVector3f(unprefixedUniformName));
+					setUniform(uniformName, renderer.getVector3f(unprefixedUniformName));
 				} else if (uniformType.equals("float")) {
-					setUniformf(uniformName, renderingEngine.getFloat(unprefixedUniformName));
+					setUniformf(uniformName, renderer.getFloat(unprefixedUniformName));
 				} else if (uniformType.equals("DirectionalLight")) {
-					setUniformDirectionalLight(uniformName, (DirectionalLight) renderingEngine.getActiveLight());
+					setUniformDirectionalLight(uniformName, (DirectionalLight) renderer.getActiveLight());
 				} else if (uniformType.equals("PointLight")) {
-					setUniformPointLight(uniformName, (PointLight) renderingEngine.getActiveLight());
+					setUniformPointLight(uniformName, (PointLight) renderer.getActiveLight());
 				} else if (uniformType.equals("SpotLight")) {
-					setUniformSpotLight(uniformName, (SpotLight) renderingEngine.getActiveLight());
+					setUniformSpotLight(uniformName, (SpotLight) renderer.getActiveLight());
 				} else {
-					renderingEngine.updateUniformStruct(transform, material, this, uniformName, uniformType);
+					renderer.updateUniformStruct(transform, material, this, uniformName, uniformType);
 				}
 			} else if (uniformType.equals("sampler2D")) {
-				int samplerSlot = renderingEngine.getSamplerSlot(uniformName);
+				int samplerSlot = renderer.getSamplerSlot(uniformName);
 				material.getTexture(uniformName).bind(samplerSlot);
 				setUniformi(uniformName, samplerSlot);
 			} else if (uniformName.startsWith("T_")) {
@@ -132,7 +132,7 @@ public class Shader {
 				}
 			} else if (uniformName.startsWith("C_")) {
 				if (uniformName.equals("C_eyePos")) {
-					setUniform(uniformName, renderingEngine.getMainCamera().getTransform().getTransformedPos());
+					setUniform(uniformName, renderer.getMainCamera().getTransform().getTransformedPos());
 				} else {
 					throw new IllegalArgumentException(uniformName + " is not a valid component of Camera");
 				}

@@ -27,26 +27,13 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.game;
 
-import deamont66.engine.core.CoreEngine;
-import deamont66.engine.core.Debug;
-import deamont66.engine.rendering.LWJGLRenderer;
+package deamont66.engine.core;
 
-public class Main {
-
-    public static void main(String[] args) {
-        Debug.DEBUG_ECHO = true;
-        Debug.ENABLE_LIGHTS = true;
-        Debug.ENABLE_SHADOWS = true;
-        Debug.ENABLE_NORMAL_MAP = true;
-        Debug.ENABLE_PARALLAX_MAP = false;
-        
-        CoreEngine engine = new CoreEngine(1280, 720, 60, true);
-        engine.setGame(TestGame.class);
-        engine.setRenderer(LWJGLRenderer.class);
-        engine.createWindow("3D Game Engine");
-        engine.start();
-        System.exit(0);
-    }
+/**
+ *
+ * @author JiriSimecek
+ */
+public abstract class GlobalConstants {
+    public static int RENDER_LIGHT_RANGE = 50;
 }

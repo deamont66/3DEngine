@@ -32,7 +32,7 @@ package deamont66.engine.components;
 
 import deamont66.engine.core.CoreEngine;
 import deamont66.engine.core.GameObject;
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 import deamont66.engine.core.Transform;
 import deamont66.engine.rendering.Shader;
 
@@ -42,7 +42,7 @@ public abstract class GameComponent
 
 	public void input(float delta) {}
 	public void update(float delta) {}
-	public void render(Shader shader, RenderingEngine renderingEngine) {}
+	public void render(Shader shader, Renderer renderer) {}
 
 	public void setParent(GameObject parent)
 	{

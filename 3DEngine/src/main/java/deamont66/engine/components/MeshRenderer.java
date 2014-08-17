@@ -30,10 +30,9 @@
 
 package deamont66.engine.components;
 
-import deamont66.engine.core.Transform;
 import deamont66.engine.rendering.Material;
 import deamont66.engine.rendering.Mesh;
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 import deamont66.engine.rendering.Shader;
 
 public class MeshRenderer extends GameComponent
@@ -48,10 +47,10 @@ public class MeshRenderer extends GameComponent
 	}
 
 	@Override
-	public void render(Shader shader, RenderingEngine renderingEngine)
+	public void render(Shader shader, Renderer renderer)
 	{
 		shader.bind();
-		shader.updateUniforms(getTransform(), material, renderingEngine);
+		shader.updateUniforms(getTransform(), material, renderer);
 		mesh.draw();
 	}
 }

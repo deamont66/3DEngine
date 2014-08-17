@@ -30,7 +30,7 @@
 
 package deamont66.engine.core;
 
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 
 public abstract class Game
 {
@@ -48,9 +48,9 @@ public abstract class Game
 		getRootObject().updateAll(delta);
 	}
 
-	public void render(RenderingEngine renderingEngine)
+	public void render(Renderer renderer)
 	{
-		renderingEngine.render(getRootObject());
+		renderer.render(getRootObject());
 	}
 
 	public void addObject(GameObject object)

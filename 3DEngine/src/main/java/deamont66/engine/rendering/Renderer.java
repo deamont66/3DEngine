@@ -27,26 +27,40 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.game;
 
-import deamont66.engine.core.CoreEngine;
-import deamont66.engine.core.Debug;
-import deamont66.engine.rendering.LWJGLRenderer;
+package deamont66.engine.rendering;
 
-public class Main {
+import deamont66.engine.components.BaseLight;
+import deamont66.engine.components.Camera;
+import deamont66.engine.core.GameObject;
+import deamont66.engine.core.Transform;
+import deamont66.engine.core.math.Matrix4f;
+import deamont66.engine.core.math.Vector3f;
+import deamont66.engine.rendering.resourceManagement.MappedValues;
 
-    public static void main(String[] args) {
-        Debug.DEBUG_ECHO = true;
-        Debug.ENABLE_LIGHTS = true;
-        Debug.ENABLE_SHADOWS = true;
-        Debug.ENABLE_NORMAL_MAP = true;
-        Debug.ENABLE_PARALLAX_MAP = false;
-        
-        CoreEngine engine = new CoreEngine(1280, 720, 60, true);
-        engine.setGame(TestGame.class);
-        engine.setRenderer(LWJGLRenderer.class);
-        engine.createWindow("3D Game Engine");
-        engine.start();
-        System.exit(0);
+/**
+ *
+ * @author JiriSimecek
+ */
+public abstract class Renderer extends MappedValues {
+    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
+    public abstract void render(GameObject object);
+    public abstract String getRenderVersion();
+    public abstract Camera getMainCamera();
+    public abstract void setMainCamera(Camera mainCamera);
+    
+    public void addLight(BaseLight light) {
+    }
+
+    public int getSamplerSlot(String samplerName) {
+        return 0;
+    }
+
+    public BaseLight getActiveLight() {
+        return new BaseLight(Vector3f.ones(), 1f);
+    }
+
+    public Matrix4f getLightMatrix() {
+        return new Matrix4f();
     }
 }

@@ -41,7 +41,7 @@ import org.lwjgl.LWJGLException;
 public class TestGame extends Game {
 
 	private LightObject flashLightObject;
-	private RenderingEngine renderingEngine;
+	private Renderer renderer;
 
 	@Override
 	public void init() {
@@ -114,9 +114,9 @@ public class TestGame extends Game {
 	@Override
 	public void update(float delta) {
 		super.update(delta);
-		if (renderingEngine != null && flashLightObject.isActive()) {
-			flashLightObject.getTransform().setPos(renderingEngine.getMainCamera().getTransform().getTransformedPos());
-			flashLightObject.getTransform().setRot(renderingEngine.getMainCamera().getTransform().getRot());
+		if (renderer != null && flashLightObject.isActive()) {
+			flashLightObject.getTransform().setPos(renderer.getMainCamera().getTransform().getTransformedPos());
+			flashLightObject.getTransform().setRot(renderer.getMainCamera().getTransform().getRot());
 		}
 	}
 
@@ -136,9 +136,9 @@ public class TestGame extends Game {
 	}
 
 	@Override
-	public void render(RenderingEngine renderingEngine) {
-		super.render(renderingEngine);
-		this.renderingEngine = renderingEngine;
+	public void render(Renderer renderer) {
+		super.render(renderer);
+		this.renderer = renderer;
 	}
 
 }
