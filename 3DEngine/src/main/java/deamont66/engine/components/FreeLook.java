@@ -80,9 +80,9 @@ public class FreeLook extends GameComponent
 			boolean rotX = deltaPos.getY() != 0;
 
 			if(rotY)
-				getTransform().rotate(yAxis, (float) Math.toRadians(deltaPos.getX() * sensitivity));
+				getParentTransform().rotate(yAxis, (float) Math.toRadians(deltaPos.getX() * sensitivity));
 			if(rotX)
-				getTransform().rotate(getTransform().getRot().getRight(), (float) Math.toRadians(-deltaPos.getY() * sensitivity));
+				getParentTransform().rotate(getParentTransform().getRot().getRight(), (float) Math.toRadians(-deltaPos.getY() * sensitivity));
 
 			if(rotY || rotX)
 				Input.setMousePosition(centerPosition);

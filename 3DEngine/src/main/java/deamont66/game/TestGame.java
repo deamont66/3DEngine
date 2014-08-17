@@ -69,8 +69,8 @@ public class TestGame extends Game {
 //  --------    GameObjects:    -----------------------------------------------------    
 		Camera camera = new Camera((float) Math.toRadians(70.0f), (float) Window.getWidth() / (float) Window.getHeight(), 0.01f, 1000.0f);
 		addObject(new GameObject().addComponent(new FreeLook(0.5f)).addComponent(new FreeMove(10.0f)).addComponent(camera));
-		camera.getTransform().getPos().set(-10, 0, 10);
-		camera.getTransform().setRot(new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(130)));
+		camera.getParentTransform().getPos().set(-10, 0, 10);
+		camera.getParentTransform().setRot(new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(130)));
 
 		addObject(new MeshObject(new Mesh("plane4.obj"), oldBricksMaterial, new Vector3f(0, -1, 0), new Quaternion(), new Vector3f(2.5f, 2.5f, 2.5f)));
 
@@ -115,8 +115,8 @@ public class TestGame extends Game {
 	public void update(float delta) {
 		super.update(delta);
 		if (renderer != null && flashLightObject.isActive()) {
-			flashLightObject.getTransform().setPos(renderer.getMainCamera().getTransform().getTransformedPos());
-			flashLightObject.getTransform().setRot(renderer.getMainCamera().getTransform().getRot());
+			flashLightObject.getTransform().setPos(renderer.getMainCamera().getParentTransform().getTransformedPos());
+			flashLightObject.getTransform().setRot(renderer.getMainCamera().getParentTransform().getRot());
 		}
 	}
 

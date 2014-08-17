@@ -117,7 +117,7 @@ public class LWJGLRenderer extends Renderer {
 
         altCamera = new Camera(new Matrix4f().initIdentity());
         altCameraObject = new GameObject().addComponent(altCamera);
-        altCamera.getTransform().rotate(new Vector3f(0, 1, 0), (float) Math.toRadians(180.0f));
+        altCamera.getParentTransform().rotate(new Vector3f(0, 1, 0), (float) Math.toRadians(180.0f));
 
         tempTarget = new Texture(Window.getWidth(), Window.getHeight(), null, GL_TEXTURE_2D, GL_NEAREST, GL_RGBA, GL_RGBA, false, GL_COLOR_ATTACHMENT0);
 
@@ -189,7 +189,7 @@ public class LWJGLRenderer extends Renderer {
                 if (light.isActive()) {
                     activeLight = light;
                     if (light instanceof PointLight) {
-                        Vector3f lightDirection = mainCamera.getTransform().getTransformedPos().sub(light.getTransform().getTransformedPos());
+                        Vector3f lightDirection = mainCamera.getParentTransform().getTransformedPos().sub(light.getParentTransform().getTransformedPos());
                         if (lightDirection.length() > RENDER_LIGHT_RANGE) {
                             continue;
                         }
@@ -201,8 +201,8 @@ public class LWJGLRenderer extends Renderer {
 
                     if (shadowInfo != null && Debug.ENABLE_SHADOWS) {
                         altCamera.setProjection(shadowInfo.getProjection());
-                        altCamera.getTransform().setPos(activeLight.getTransform().getTransformedPos());
-                        altCamera.getTransform().setRot(activeLight.getTransform().getTransformedRot());
+                        altCamera.getParentTransform().setPos(activeLight.getParentTransform().getTransformedPos());
+                        altCamera.getParentTransform().setRot(activeLight.getParentTransform().getTransformedRot());
 
                         lightMatrix = biasMatrix.mul(altCamera.getViewProjection());
                         setVector3f("shadowTexelSize", new Vector3f(1.0f/1024.0f, 1.0f/1024.0f, 0.0f));

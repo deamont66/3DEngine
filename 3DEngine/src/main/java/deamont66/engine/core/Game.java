@@ -57,6 +57,8 @@ public abstract class Game
 	{
 		getRootObject().addChild(object);
 	}
+        
+        public void cleanUp() {}
 
 	private GameObject getRootObject()
 	{

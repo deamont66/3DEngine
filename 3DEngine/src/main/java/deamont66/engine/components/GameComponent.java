@@ -49,7 +49,7 @@ public abstract class GameComponent
 		this.parent = parent;
 	}
 
-	public Transform getTransform()
+	public Transform getParentTransform()
 	{
 		return parent.getTransform();
 	}

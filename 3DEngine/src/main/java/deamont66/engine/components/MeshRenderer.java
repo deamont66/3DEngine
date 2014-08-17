@@ -50,7 +50,7 @@ public class MeshRenderer extends GameComponent
 	public void render(Shader shader, Renderer renderer)
 	{
 		shader.bind();
-		shader.updateUniforms(getTransform(), material, renderer);
+		shader.updateUniforms(getParentTransform(), material, renderer);
 		mesh.draw();
 	}
 }

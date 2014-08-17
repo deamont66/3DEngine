@@ -48,7 +48,7 @@ public class SpotLight extends PointLight
 	
 	public Vector3f getDirection()
 	{
-		return getTransform().getTransformedRot().getForward();
+		return getParentTransform().getTransformedRot().getForward();
 	}
 
 	public float getCutoff()

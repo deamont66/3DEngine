@@ -43,15 +43,15 @@ public class LookAtComponent extends GameComponent {
     }
     
     public LookAtComponent(GameComponent lookAtComponent) {
-        lookAt = lookAtComponent.getTransform();
+        lookAt = lookAtComponent.getParentTransform();
     }
 
     @Override
     public void update(float delta) {
-        Quaternion newRot = getTransform().getLookAtRotation(lookAt.getTransformedPos(),
+        Quaternion newRot = getParentTransform().getLookAtRotation(lookAt.getTransformedPos(),
                 new Vector3f(0, 1, 0));
 
         //getTransform().setRot(getTransform().getRot().nlerp(newRot, delta * 5.0f, true));
-        getTransform().setRot(getTransform().getRot().slerp(newRot, delta * 5.0f, true));
+        getParentTransform().setRot(getParentTransform().getRot().slerp(newRot, delta * 5.0f, true));
     }
 }

@@ -132,7 +132,7 @@ public class Shader {
 				}
 			} else if (uniformName.startsWith("C_")) {
 				if (uniformName.equals("C_eyePos")) {
-					setUniform(uniformName, renderer.getMainCamera().getTransform().getTransformedPos());
+					setUniform(uniformName, renderer.getMainCamera().getParentTransform().getTransformedPos());
 				} else {
 					throw new IllegalArgumentException(uniformName + " is not a valid component of Camera");
 				}
@@ -410,7 +410,7 @@ public class Shader {
 		setUniformf(uniformName + ".atten.constant", pointLight.getAttenuation().getConstant());
 		setUniformf(uniformName + ".atten.linear", pointLight.getAttenuation().getLinear());
 		setUniformf(uniformName + ".atten.exponent", pointLight.getAttenuation().getExponent());
-		setUniform(uniformName + ".position", pointLight.getTransform().getTransformedPos());
+		setUniform(uniformName + ".position", pointLight.getParentTransform().getTransformedPos());
 		setUniformf(uniformName + ".range", pointLight.getRange());
 	}
 

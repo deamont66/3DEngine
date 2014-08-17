@@ -153,6 +153,7 @@ public class CoreEngine {
     }
 
     private void cleanUp() {
+        game.cleanUp();
         Window.dispose();
     }
 
