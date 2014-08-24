@@ -35,7 +35,6 @@ import deamont66.engine.components.PointLight;
 import deamont66.engine.core.Debug;
 import deamont66.engine.core.GameObject;
 import deamont66.engine.core.Transform;
-import deamont66.engine.core.Util;
 import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
@@ -93,7 +92,7 @@ public class RenderingEngine extends MappedValues {
         samplerMap.put("normalMap", 1);
         samplerMap.put("dispMap", 2);
         samplerMap.put("shadowMap", 3);
-        samplerMap.put("filterTexture", 4);
+//        samplerMap.put("filterTexture", 4);
 
         setVector3f("ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         if (!Debug.ENABLE_LIGHTS) {
@@ -148,7 +147,10 @@ public class RenderingEngine extends MappedValues {
     }
 
     private void applyFilter(Shader filter, Texture source, Texture dest) {
-        assert (source != dest);
+        if(source == dest) {
+            System.err.println(getClass().getSimpleName() + "->applyFilter(): dest texture cannot equal to source");
+            System.exit(0);
+        }
         if (dest == null) {
             Window.bindAsRenderTarget();
         } else {
