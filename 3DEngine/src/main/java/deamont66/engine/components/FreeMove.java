@@ -33,7 +33,7 @@ package deamont66.engine.components;
 import deamont66.engine.core.Input;
 import deamont66.engine.core.math.Vector3f;
 
-public class FreeMove extends GameComponent
+public class FreeMove extends EntityComponent
 {
 	private float speed;
 	private int forwardKey;
@@ -56,7 +56,7 @@ public class FreeMove extends GameComponent
 	}
 
 	@Override
-	public void input(float delta)
+	public void processInput(float delta)
 	{
 		float movAmt = speed * delta;
 

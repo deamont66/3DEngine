@@ -35,7 +35,7 @@ import deamont66.engine.core.math.Vector2f;
 import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.rendering.Window;
 
-public class FreeLook extends GameComponent
+public class FreeLook extends EntityComponent
 {
 	private static final Vector3f yAxis = new Vector3f(0,1,0);
 
@@ -55,7 +55,7 @@ public class FreeLook extends GameComponent
 	}
 
 	@Override
-	public void input(float delta)
+	public void processInput(float delta)
 	{
 		Vector2f centerPosition = new Vector2f(Window.getWidth()/2, Window.getHeight()/2);
 

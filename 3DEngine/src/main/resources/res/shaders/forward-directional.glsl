@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-#version 330
+#include "common.glh"
+#include "forwardlighting.glh"
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 texCoord;
+#if defined(VS_BUILD)
+#include "forwardlighting.vsh"
+#elif defined(FS_BUILD)
 
-out vec2 texCoord0;
+#include "lighting.glh"
 
-uniform mat4 transform;
+uniform vec3 C_eyePos;
+uniform float specularIntensity;
+uniform float specularPower;
 
-void main()
+uniform DirectionalLight R_directionalLight;
+
+vec4 CalcLightingEffect(vec3 normal, vec3 worldPos)
 {
-    gl_Position = transform * vec4(position, 1.0);
-    texCoord0 = texCoord;
+	return CalcLight(R_directionalLight.base, -R_directionalLight.direction, normal, worldPos,
+	                 specularIntensity, specularPower, C_eyePos);
 }
+
+#include "lightingMain.fsh"
+#endif

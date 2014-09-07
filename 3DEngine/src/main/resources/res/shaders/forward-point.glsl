@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-attribute vec3 position;
-attribute vec2 texCoord;
+#include "common.glh"
+#include "forwardlighting.glh"
 
-uniform mat4 T_MVP;
+#if defined(VS_BUILD)
+#include "forwardlighting.vsh"
+#elif defined(FS_BUILD)
 
-void main()
+#include "lighting.glh"
+
+uniform vec3 C_eyePos;
+uniform float specularIntensity;
+uniform float specularPower;
+
+uniform PointLight R_pointLight;
+
+vec4 CalcLightingEffect(vec3 normal, vec3 worldPos)
 {
-    gl_Position = T_MVP * vec4(position, 1.0);
-    texCoord0 = texCoord; 
+	return CalcPointLight(R_pointLight, normal, worldPos,
+	                      specularIntensity, specularPower, C_eyePos);
 }
+
+#include "lightingMain.fsh"
+#endif

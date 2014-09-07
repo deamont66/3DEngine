@@ -34,7 +34,7 @@ import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.core.*;
 
-public class Camera extends GameComponent
+public class Camera extends EntityComponent
 {
 	private Matrix4f projection;
         

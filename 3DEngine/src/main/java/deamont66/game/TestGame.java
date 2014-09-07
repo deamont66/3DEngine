@@ -29,6 +29,8 @@
  */
 package deamont66.game;
 
+import deamont66.game.entities.MeshEntity;
+import deamont66.game.entities.LightEntity;
 import deamont66.engine.components.*;
 import deamont66.engine.core.*;
 import deamont66.engine.core.math.Quaternion;
@@ -40,11 +42,12 @@ import org.lwjgl.LWJGLException;
 
 public class TestGame extends Game {
 
-	private LightObject flashLightObject;
-	private RenderingEngine renderingEngine;
+	private LightEntity flashLightObject;
+	private Renderer renderingEngine;
 
 	@Override
 	public void init() {
+                Window.setTitle("3D Engine Test");
 //  --------    Materials:    -----------------------------------------------------    
 		Material oldBricksMaterial = new Material();
 		oldBricksMaterial.setTexture("diffuse", new Texture("bricks.jpg"));
@@ -68,47 +71,47 @@ public class TestGame extends Game {
 
 //  --------    GameObjects:    -----------------------------------------------------    
 		Camera camera = new Camera((float) Math.toRadians(70.0f), (float) Window.getWidth() / (float) Window.getHeight(), 0.01f, 1000.0f);
-		addObject(new GameObject().addComponent(new FreeLook(0.5f)).addComponent(new FreeMove(10.0f)).addComponent(camera));
+		addToScene(new Entity().addComponent(new FreeLook(0.5f)).addComponent(new FreeMove(10.0f)).addComponent(camera));
 		camera.getTransform().getPos().set(-10, 0, 10);
 		camera.getTransform().setRot(new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(130)));
 
-		addObject(new MeshObject(new Mesh("plane4.obj"), oldBricksMaterial, new Vector3f(0, -1, 0), new Quaternion(), new Vector3f(2.5f, 2.5f, 2.5f)));
+		addToScene(new MeshEntity(new Mesh("plane4.obj"), oldBricksMaterial, new Vector3f(0, -1, 0), new Quaternion(), new Vector3f(2.5f, 2.5f, 2.5f)));
 
 		Quaternion wall4Rot = new Quaternion(new Vector3f(1, 0, 0), (float) Math.toRadians(90));
 		wall4Rot.mul(new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(90)));
-		addObject(new MeshObject(new Mesh("plane4.obj"), brickMaterial, new Vector3f(0, 8f, -8f), wall4Rot));
+		addToScene(new MeshEntity(new Mesh("plane4.obj"), brickMaterial, new Vector3f(0, 8f, -8f), wall4Rot));
 
-		addObject(new MeshObject(new Mesh("plant.obj"), plantMaterial, new Vector3f(0, -1, 5)));
+		addToScene(new MeshEntity(new Mesh("plant.obj"), plantMaterial, new Vector3f(0, -1, 5)));
 
 //		GameObject[] angryMonkeys = new GameObject[5];
 //		for (int i = 0; i < angryMonkeys.length; i++) {
 //			angryMonkeys[i] = new MeshObject(new Mesh("monkey3.obj"), oldBricksMaterial, new Vector3f(6, 3, 6 - i * 3)).addComponent(new LookAtComponent(camera));
-//			addObject(angryMonkeys[i]);
+//			addToScene(angryMonkeys[i]);
 //		}
                 
-                addObject(new MeshObject(new Mesh("monkey3.obj"), oldBricksMaterial, new Vector3f(6, 3, 6 - 0 * 3)).addComponent(new LookAtComponent(camera)));
+                addToScene(new MeshEntity(new Mesh("monkey3.obj"), oldBricksMaterial, new Vector3f(6, 3, 6 - 0 * 3)).addComponent(new LookAtComponent(camera)));
 
-		addObject(new MeshObject(new Mesh("plane.obj"), oldBricksMaterial, new Vector3f(-5, 2, 0)));
+		addToScene(new MeshEntity(new Mesh("plane.obj"), oldBricksMaterial, new Vector3f(-5, 2, 0)));
 
-		addObject(new MeshObject(new Mesh("cube.obj"), brickMaterial, new Vector3f(3, 0, 0), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(30))));
+		addToScene(new MeshEntity(new Mesh("cube.obj"), brickMaterial, new Vector3f(3, 0, 0), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(30))));
 
 //  --------    LIGHTING:    -----------------------------------------------------    
-		DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0.5f, 0.5f, 0.5f), 0.6f);
-		addObject(new LightObject(directionalLight, new Vector3f(), new Quaternion(new Vector3f(1, 0, 0), (float) Math.toRadians(-45))));
+		DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0.5f, 0.5f, 0.5f), 0.6f, 5);
+		addToScene(new LightEntity(directionalLight, new Vector3f(), new Quaternion(new Vector3f(1, 0, 0), (float) Math.toRadians(-45))));
 
 		PointLight pointLight = new PointLight(new Vector3f(0, 1, 0), 0.4f,
 			new Attenuation(0, 0, 1));
-//		addObject(new LightObject(pointLight));
+		addToScene(new LightEntity(pointLight));
 
 		SpotLight spotLight = new SpotLight(new Vector3f(0f, 1f, 1f), 3f,
 			new Attenuation(0, 0, 0.1f), 0.9f);
-//		addObject(new LightObject(spotLight, new Vector3f(-3, 0, 5), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(90))));
+		addToScene(new LightEntity(spotLight, new Vector3f(-3, 0, 5), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(90))));
 
 		SpotLight flashLight = new SpotLight(new Vector3f(255 / 255f, 201 / 255f, 103 / 255f), 2f,
 			new Attenuation(0, 0, 0.1f), 0.9f);
-		flashLightObject = new LightObject(flashLight, new Vector3f(5, 0, 5), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(90)));
+		flashLightObject = new LightEntity(flashLight, new Vector3f(5, 0, 5), new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(90)));
 		flashLightObject.setActive(false);
-//		addObject(flashLightObject);
+		addToScene(flashLightObject);
 	}
 
 	@Override
@@ -121,8 +124,8 @@ public class TestGame extends Game {
 	}
 
 	@Override
-	public void input(float delta) {
-		super.input(delta);
+	public void processInput(float delta) {
+		super.processInput(delta);
 		if (Input.getKeyDown(Input.KEY_F)) {
 			flashLightObject.setActive(!flashLightObject.isActive());
 		}
@@ -136,7 +139,7 @@ public class TestGame extends Game {
 	}
 
 	@Override
-	public void render(RenderingEngine renderingEngine) {
+	public void render(Renderer renderingEngine) {
 		super.render(renderingEngine);
 		this.renderingEngine = renderingEngine;
 	}

@@ -27,29 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.rendering;
 
-import deamont66.engine.core.math.Vector3f;
+public class Attenuation {
 
-public class Attenuation extends Vector3f
-{
-	public Attenuation(float constant, float linear, float exponent) {
-		super(constant, linear, exponent);
-	}
+    private final float constant;
+    private final float linear;
+    private final float exponent;
 
-	public float getConstant()
-	{
-		return getX();
-	}
+    public Attenuation() {
+        this(0, 0, 0);
+    }
 
-	public float getLinear()
-	{
-		return getY();
-	}
+    public Attenuation(float constant, float linear, float exponent) {
+        this.constant = constant;
+        this.linear = linear;
+        this.exponent = exponent;
+    }
 
-	public float getExponent()
-	{
-		return getZ();
-	}
+    public float getConstant() {
+        return constant;
+    }
+
+    public float getLinear() {
+        return linear;
+    }
+
+    public float getExponent() {
+        return exponent;
+    }
 }

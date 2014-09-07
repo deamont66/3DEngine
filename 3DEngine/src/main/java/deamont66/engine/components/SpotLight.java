@@ -27,36 +27,60 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.components;
 
+import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.rendering.Attenuation;
 import deamont66.engine.rendering.Shader;
+import deamont66.engine.rendering.ShadowInfo;
 
-public class SpotLight extends PointLight
-{
-	private float cutoff;
-	
-	public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float cutoff)
-	{
-		super(color, intensity, attenuation);
-		this.cutoff = cutoff;
+public class SpotLight extends PointLight {
 
-		setShader(new Shader("forward-spot"));
-	}
-	
-	public Vector3f getDirection()
-	{
-		return getTransform().getTransformedRot().getForward();
-	}
+    private final float cutoff;
+    
+    public SpotLight() {
+        this(new Vector3f(0,0,0));
+    }
+    
+    public SpotLight(Vector3f color) {
+        this(color, 0);
+    }
+    
+    public SpotLight(Vector3f color, float intensity) {
+        this(color, intensity, new Attenuation());
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation) {
+        this(color, intensity, attenuation, (float) Math.toRadians(170.0f));
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float viewAngle) {
+        this(color, intensity, attenuation, viewAngle, 0);
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float viewAngle, int shadowMapSizeAsPowerOf2) {
+        this(color, intensity, attenuation, viewAngle, shadowMapSizeAsPowerOf2, 1);
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float viewAngle, int shadowMapSizeAsPowerOf2, float shadowSoftness) {
+        this(color, intensity, attenuation, viewAngle, shadowMapSizeAsPowerOf2, shadowSoftness, 0.02f);
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float viewAngle, int shadowMapSizeAsPowerOf2, float shadowSoftness, float lightBleedReductionAmount) {
+        this(color, intensity, attenuation, viewAngle, shadowMapSizeAsPowerOf2, shadowSoftness, lightBleedReductionAmount, 0.00002f);
+    }
+    
+    public SpotLight(Vector3f color, float intensity, Attenuation attenuation, float viewAngle, int shadowMapSizeAsPowerOf2, float shadowSoftness, float lightBleedReductionAmount, float minVariance) {
+        super(color, intensity, attenuation, new Shader("forward-spot"));
+        cutoff = (float) Math.cos(viewAngle / 2);
 
-	public float getCutoff()
-	{
-		return cutoff;
-	}
-	public void setCutoff(float cutoff)
-	{
-		this.cutoff = cutoff;
-	}
+        if (shadowMapSizeAsPowerOf2 != 0) {
+            setShadowInfo(new ShadowInfo(new Matrix4f().initPerspective(viewAngle, 1.0f, 0.1f, getRange()), false, shadowMapSizeAsPowerOf2, shadowSoftness, lightBleedReductionAmount, minVariance));
+        }
+    }
+
+    public float getCutoff() {
+        return cutoff;
+    }
 }

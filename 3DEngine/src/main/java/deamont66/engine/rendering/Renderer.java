@@ -27,65 +27,37 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.components;
+package deamont66.engine.rendering;
 
-import deamont66.engine.core.CoreEngine;
-import deamont66.engine.core.math.Quaternion;
-import deamont66.engine.core.math.Vector3f;
-import deamont66.engine.rendering.Shader;
-import deamont66.engine.rendering.ShadowCameraTransform;
-import deamont66.engine.rendering.ShadowInfo;
+import deamont66.engine.components.BaseLight;
+import deamont66.engine.components.Camera;
+import deamont66.engine.core.Entity;
+import deamont66.engine.core.Transform;
+import deamont66.engine.core.math.Matrix4f;
+import deamont66.engine.rendering.resourceManagement.MappedValues;
 
-public class BaseLight extends EntityComponent {
+public abstract class Renderer extends MappedValues {
 
-	private Vector3f    m_color;
-	private float       m_intensity;
-	private Shader      m_shader;
-	private boolean     m_active;
-	private ShadowInfo  m_shadowInfo;
+    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
+    public abstract void render(Entity object);
+    public abstract String getRendererVersion();
+    public abstract Camera getMainCamera();
+    public abstract void setMainCamera(Camera mainCamera);
+    
+    public void addLight(BaseLight light) {
+    }
 
-	public BaseLight(Vector3f color, float intensity, Shader shader) {
-		this.m_color = color;
-		this.m_intensity = intensity;
-                this.m_shader = shader;
-		this.m_active = true;
-		this.m_shadowInfo = new ShadowInfo();
-	}
+    public int getSamplerSlot(String samplerName) {
+        return 0;
+    }
 
-        public ShadowCameraTransform calcShadowCameraTransform(Vector3f mainCameraPos, Quaternion mainCameraRot) {
-            return new ShadowCameraTransform(getTransform().getTransformedPos(), getTransform().getTransformedRot());
-        }
-        
-	@Override
-	public void addToEngine(CoreEngine engine) {
-		engine.getRenderingEngine().addLight(this);
-	}
+    public BaseLight getActiveLight() {
+        return null;
+    }
 
-	public Shader getShader() {
-		return m_shader;
-	}
+    public Matrix4f getLightMatrix() {
+        return new Matrix4f();
+    }
 
-	public Vector3f getColor() {
-		return m_color;
-	}
-
-	public float getIntensity() {
-		return m_intensity;
-	}
-
-	public boolean isActive() {
-		return m_active;
-	}
-
-	public void setActive(boolean active) {
-		this.m_active = active;
-	}
-
-	public ShadowInfo getShadowInfo() {
-		return m_shadowInfo;
-	}
-
-	protected void setShadowInfo(ShadowInfo shadowInfo) {
-		this.m_shadowInfo = shadowInfo;
-	}
+    
 }

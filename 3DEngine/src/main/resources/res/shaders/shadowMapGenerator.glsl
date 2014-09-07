@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-#version 330
+#include "common.glh"
 
-in vec2 texCoord0;
+#if defined(VS_BUILD)
+attribute vec3 position;
 
-out vec4 fragColor;
-
-uniform vec3 color;
-uniform sampler2D sampler;
+uniform mat4 T_MVP;
 
 void main()
 {
-    vec4 textureColor = texture(sampler, texCoord0.xy);
-
-    if(textureColor == vec4(0,0,0,0))
-        fragColor = vec4(color, 1);
-    else
-        fragColor = textureColor * vec4(color, 1);
+    gl_Position = T_MVP * vec4(position, 1.0);
 }
+#elif defined(FS_BUILD)
+DeclareFragOutput(0, vec4);
+void main()
+{
+	float depth = gl_FragCoord.z;
+
+	float dx = dFdx(depth);
+	float dy = dFdy(depth);
+	float moment2 = depth * depth + 0.25 * (dx * dx + dy * dy);
+
+	SetFragOutput(0, vec4(depth, moment2, 0.0, 0.0));
+}
+#endif

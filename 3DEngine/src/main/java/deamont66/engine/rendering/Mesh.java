@@ -32,18 +32,18 @@ package deamont66.engine.rendering;
 import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.rendering.meshLoading.IndexedModel;
 import deamont66.engine.rendering.meshLoading.OBJModel;
-import deamont66.engine.rendering.resourceManagement.MeshResource;
+import deamont66.engine.rendering.resourceManagement.MeshData;
 import java.util.HashMap;
 
 public class Mesh {
 
-    private static final HashMap<String, MeshResource> loadedModels = new HashMap<>();
-    private MeshResource resource;
+    private static final HashMap<String, MeshData> loadedModels = new HashMap<>();
+    private MeshData resource;
     private String fileName;
 
     public Mesh(String fileName) {
         this.fileName = fileName;
-        MeshResource oldResource = loadedModels.get(fileName);
+        MeshData oldResource = loadedModels.get(fileName);
 
         if (oldResource != null) {
             resource = oldResource;
@@ -56,12 +56,12 @@ public class Mesh {
 
     public Mesh(String meshName, IndexedModel model) {
         this.fileName = meshName;
-        MeshResource oldResource = loadedModels.get(fileName);
+        MeshData oldResource = loadedModels.get(fileName);
         if (oldResource != null) {
             resource = oldResource;
             resource.addReference();
         } else {
-            resource = new MeshResource(model);
+            resource = new MeshData(model);
             loadedModels.put(fileName, resource);
         }
     }
@@ -100,7 +100,7 @@ public class Mesh {
             model.addFace(indices[i], indices[i + 1], indices[i + 2]);
         }
 
-        resource = new MeshResource(model);
+        resource = new MeshData(model);
     }
 
     public void draw() {
@@ -143,7 +143,7 @@ public class Mesh {
         model.calcNormals();
         model.calcTangents();
 
-        resource = new MeshResource(model);
+        resource = new MeshData(model);
 
         return this;
     }

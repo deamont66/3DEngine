@@ -34,15 +34,15 @@ import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.*;
 
-public class LookAtComponent extends GameComponent {
+public class LookAtComponent extends EntityComponent {
 
     private final Transform lookAt;
 
-    public LookAtComponent(GameObject lookAtObject) {
+    public LookAtComponent(Entity lookAtObject) {
         lookAt = lookAtObject.getTransform();
     }
     
-    public LookAtComponent(GameComponent lookAtComponent) {
+    public LookAtComponent(EntityComponent lookAtComponent) {
         lookAt = lookAtComponent.getTransform();
     }
 

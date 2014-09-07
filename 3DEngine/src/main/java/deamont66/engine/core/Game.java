@@ -30,17 +30,17 @@
 
 package deamont66.engine.core;
 
-import deamont66.engine.rendering.RenderingEngine;
+import deamont66.engine.rendering.Renderer;
 
 public abstract class Game
 {
-	private GameObject root;
+	private Entity root;
 
 	public void init() {}
 
-	public void input(float delta)
+	public void processInput(float delta)
 	{
-		getRootObject().inputAll(delta);
+		getRootObject().processInputAll(delta);
 	}
 
 	public void update(float delta)
@@ -48,23 +48,25 @@ public abstract class Game
 		getRootObject().updateAll(delta);
 	}
 
-	public void render(RenderingEngine renderingEngine)
+	public void render(Renderer renderer)
 	{
-		renderingEngine.render(getRootObject());
+		renderer.render(getRootObject());
 	}
 
-	public void addObject(GameObject object)
+	public void addToScene(Entity object)
 	{
 		getRootObject().addChild(object);
 	}
 
-	private GameObject getRootObject()
+	private Entity getRootObject()
 	{
 		if(root == null)
-			root = new GameObject();
+			root = new Entity();
 
 		return root;
 	}
 
 	public void setEngine(CoreEngine engine) { getRootObject().setEngine(engine); }
+
+        public void cleanUp() {}
 }

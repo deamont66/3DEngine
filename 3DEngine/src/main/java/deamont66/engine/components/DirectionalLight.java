@@ -27,26 +27,76 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.components;
 
 import deamont66.engine.core.math.Matrix4f;
+import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.rendering.Shader;
+import deamont66.engine.rendering.ShadowCameraTransform;
 import deamont66.engine.rendering.ShadowInfo;
 
-public class DirectionalLight extends BaseLight
-{
-	public DirectionalLight(Vector3f color, float intensity)
-	{
-		super(color, intensity);
+public class DirectionalLight extends BaseLight {
 
-		setShader(new Shader("forward-directional"));		
-		setShadowInfo(new ShadowInfo(new Matrix4f().initOrthographic(-40, 40, -40, 40, -40, 40), true));
-	}
+    private float m_halfShadowArea;
 
-	public Vector3f getDirection()
-	{
-		return getTransform().getTransformedRot().getForward();
-	}
+    public DirectionalLight() {
+        this(new Vector3f(0,0,0));
+    }
+    
+    public DirectionalLight(Vector3f color) {
+        this(color, 0);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity) {
+        this(color, intensity, 0);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity, int shadowMapSizeAsPowerOf2) {
+        this(color, intensity, shadowMapSizeAsPowerOf2, 80.0f);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity, int shadowMapSizeAsPowerOf2, float shadowArea) {
+        this(color, intensity, shadowMapSizeAsPowerOf2, shadowArea, 1.0f);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity, int shadowMapSizeAsPowerOf2, float shadowArea, float shadowSoftness) {
+        this(color, intensity, shadowMapSizeAsPowerOf2, shadowArea, shadowSoftness, 0.2f);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity, int shadowMapSizeAsPowerOf2, float shadowArea, float shadowSoftness, float lightBleedReductionAmount) {
+        this(color, intensity, shadowMapSizeAsPowerOf2, shadowArea, shadowSoftness, lightBleedReductionAmount, 0.00002f);
+    }
+    
+    public DirectionalLight(Vector3f color, float intensity, int shadowMapSizeAsPowerOf2, float shadowArea, float shadowSoftness, float lightBleedReductionAmount, float minVariance) {
+        super(color, intensity, new Shader("forward-directional"));
+        m_halfShadowArea = shadowArea / 2.0f;
+        
+        if (shadowMapSizeAsPowerOf2 != 0) {
+            setShadowInfo(new ShadowInfo(new Matrix4f().initOrthographic(-m_halfShadowArea, m_halfShadowArea, -m_halfShadowArea,
+                    m_halfShadowArea, -m_halfShadowArea, m_halfShadowArea),
+                    true, shadowMapSizeAsPowerOf2, shadowSoftness, lightBleedReductionAmount, minVariance));
+        }
+    }
+
+    @Override
+    public ShadowCameraTransform calcShadowCameraTransform(Vector3f mainCameraPos, Quaternion mainCameraRot) {
+        Vector3f resultPos = mainCameraPos.add(mainCameraRot.getForward().mul(getHalfShadowArea()));
+	Quaternion resultRot = getTransform().getTransformedRot();
+	
+	float worldTexelSize = (getHalfShadowArea()*2)/((float)(1 << getShadowInfo().getShadowMapSizeAsPowerOf2()));
+	
+	Vector3f lightSpaceCameraPos = resultPos.rotate(resultRot.conjugated());
+	
+	lightSpaceCameraPos.setX(worldTexelSize * (float)Math.floor(lightSpaceCameraPos.getX() / worldTexelSize));
+	lightSpaceCameraPos.setY(worldTexelSize * (float)Math.floor(lightSpaceCameraPos.getY() / worldTexelSize));
+	
+	resultPos = lightSpaceCameraPos.rotate(resultRot);
+	
+	return new ShadowCameraTransform(resultPos, resultRot);
+    }
+
+    public float getHalfShadowArea() {
+        return m_halfShadowArea;
+    }
 }

@@ -38,12 +38,28 @@ public class PointLight extends BaseLight
 {
 	private static final int COLOR_DEPTH = 256;
 
-	private Attenuation attenuation;
-	private float range;
-	
-	public PointLight(Vector3f color, float intensity, Attenuation attenuation)
+	private final Attenuation attenuation;
+	private final float range;
+        
+        public PointLight(){
+            this(new Vector3f(0, 0, 0));
+        }
+        
+        public PointLight(Vector3f color) {
+            this(color, 0);
+        }
+        
+        public PointLight(Vector3f color, float intensity) {
+            this(color, intensity, new Attenuation());
+        }
+        
+        public PointLight(Vector3f color, float intensity, Attenuation attenuation) {
+            this(color, intensity, attenuation, new Shader("forward-point"));
+        }
+        
+	public PointLight(Vector3f color, float intensity, Attenuation attenuation, Shader shader)
 	{
-		super(color, intensity);
+		super(color, intensity, shader);
 		this.attenuation = attenuation;
 
 		float a = attenuation.getExponent();
@@ -51,18 +67,11 @@ public class PointLight extends BaseLight
 		float c = attenuation.getConstant() - COLOR_DEPTH * getIntensity() * getColor().max();
 
 		this.range = (float)((-b + Math.sqrt(b * b - 4 * a * c))/(2 * a));
-
-		setShader(new Shader("forward-point"));
 	}
 
 	public float getRange()
 	{
 		return range;
-	}
-
-	public void setRange(float range)
-	{
-		this.range = range;
 	}
 
 	public Attenuation getAttenuation()

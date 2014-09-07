@@ -38,6 +38,7 @@ public class Debug {
     public static boolean DEBUG_ECHO = false;
     public static boolean ENABLE_LIGHTS = true;
     public static boolean ENABLE_SHADOWS = true;
+    public static boolean ENABLE_SHADERS = true;
     public static boolean ENABLE_PARALLAX_MAP = true;
     public static boolean ENABLE_NORMAL_MAP = true;
 }

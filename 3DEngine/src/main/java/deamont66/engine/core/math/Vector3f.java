@@ -27,7 +27,6 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.core.math;
 
 public class Vector3f extends javax.vecmath.Vector3f {
@@ -39,7 +38,7 @@ public class Vector3f extends javax.vecmath.Vector3f {
     public Vector3f(float[] v) {
         super(v);
     }
-    
+
     public Vector3f(float x, float y, float z) {
         super(x, y, z);
     }
@@ -191,10 +190,17 @@ public class Vector3f extends javax.vecmath.Vector3f {
     }
 
     public boolean equals(Vector3f r) {
+        if (r == null) {
+            return false;
+        }
         return x == r.getX() && y == r.getY() && z == r.getZ();
     }
-    
+
     public static Vector3f ones() {
         return new Vector3f(1f, 1f, 1f);
+    }
+
+    public static Vector3f zeros() {
+        return new Vector3f(0f, 0f, 0f);
     }
 }

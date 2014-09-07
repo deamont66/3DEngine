@@ -29,6 +29,7 @@
  */
 package deamont66.engine.rendering;
 
+import deamont66.engine.core.Debug;
 import deamont66.engine.core.math.Matrix4f;
 
 /**
@@ -37,41 +38,67 @@ import deamont66.engine.core.math.Matrix4f;
  */
 public class ShadowInfo {
 
-    private final Matrix4f projection;
-    private final boolean flipfaces;
-    private final float shadowSoftness;
-    private final float lightBleedReductionAmount;
-    private final float minVariance;
+    private Matrix4f    m_projection;
+    private boolean     m_flipFaces;
+    private int         m_shadowMapSizeAsPowerOf2;
+    private float       m_shadowSoftness;
+    private float       m_lightBleedReductionAmount;
+    private float       m_minVariance;
 
-    public ShadowInfo(Matrix4f projection, boolean flipFaces) {
-        this(projection, flipFaces, 1.0f, 0.2f, 0.00002f);
+    public ShadowInfo() {
+        this(new Matrix4f().initIdentity());
     }
     
-    public ShadowInfo(Matrix4f projection, boolean flipFaces, float shadowSoftness, float lightBleedReductionAmount, float minVariance) {
-        this.projection = projection;
-        this.flipfaces = flipFaces;
-        this.shadowSoftness = shadowSoftness;
-        this.lightBleedReductionAmount = lightBleedReductionAmount;
-        this.minVariance = minVariance;
+    public ShadowInfo(Matrix4f projection) {
+        this(projection, false);
+    }
+    
+    public ShadowInfo(Matrix4f projection, boolean flipFaces) {
+        this(projection, flipFaces, 0);
+    }
+    
+    public ShadowInfo(Matrix4f projection, boolean flipFaces, int shadowMapSizeAsPowerOf2) {
+        this(projection, flipFaces, shadowMapSizeAsPowerOf2, 1.0f);
+    }
+
+    public ShadowInfo(Matrix4f projection, boolean flipFaces, int shadowMapSizeAsPowerOf2, float shadowSoftness) {
+        this(projection, flipFaces, shadowMapSizeAsPowerOf2, shadowSoftness, 0.2f);
+    }
+    
+    public ShadowInfo(Matrix4f projection, boolean flipFaces, int shadowMapSizeAsPowerOf2, float shadowSoftness, float lightBleedReductionAmount) {
+        this(projection, flipFaces, shadowMapSizeAsPowerOf2, shadowSoftness, lightBleedReductionAmount, 0.00002f);
+    }
+
+    public ShadowInfo(Matrix4f projection, boolean flipFaces, int shadowMapSizeAsPowerOf2, float shadowSoftness, float lightBleedReductionAmount, float minVariance) {
+        this.m_projection = projection;
+        this.m_flipFaces = flipFaces;
+        this.m_shadowMapSizeAsPowerOf2 = ((Debug.ENABLE_SHADOWS) ? shadowMapSizeAsPowerOf2 : 0);
+        this.m_shadowSoftness = shadowSoftness;
+        this.m_lightBleedReductionAmount = lightBleedReductionAmount;
+        this.m_minVariance = minVariance;
     }
 
     public Matrix4f getProjection() {
-        return projection;
+        return m_projection;
     }
 
     public boolean getFlipfaces() {
-        return flipfaces;
+        return m_flipFaces;
     }
 
+    public int getShadowMapSizeAsPowerOf2() {
+        return m_shadowMapSizeAsPowerOf2;
+    }
+    
     public float getShadowSoftness() {
-        return shadowSoftness;
+        return m_shadowSoftness;
     }
 
     public float getMinVariance() {
-        return minVariance;
+        return m_minVariance;
     }
 
     public float getLightBleedReductionAmount() {
-        return lightBleedReductionAmount;
+        return m_lightBleedReductionAmount;
     }
 }

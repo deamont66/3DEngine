@@ -31,18 +31,22 @@ package deamont66.game;
 
 import deamont66.engine.core.CoreEngine;
 import deamont66.engine.core.Debug;
+import deamont66.engine.rendering.LWJGLRenderer;
 
 public class Main {
 
     public static void main(String[] args) {
         Debug.DEBUG_ECHO = true;
         Debug.ENABLE_LIGHTS = true;
-        Debug.ENABLE_SHADOWS = true;
+        Debug.ENABLE_SHADOWS = false;
+        Debug.ENABLE_SHADERS = true;
         Debug.ENABLE_NORMAL_MAP = true;
-        Debug.ENABLE_PARALLAX_MAP = false;
+        Debug.ENABLE_PARALLAX_MAP = true;
         
-        CoreEngine engine = new CoreEngine(1280, 720, 60, true, new TestGame());
-        engine.createWindow("3D Game Engine");
+        CoreEngine engine = new CoreEngine(1280, 720, 120, true);
+        engine.setRenderer(LWJGLRenderer.class);
+        engine.setGame(PhysicsTestGame.class);
+        engine.createWindow();
         engine.start();
         System.exit(0);
     }

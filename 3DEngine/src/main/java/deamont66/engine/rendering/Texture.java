@@ -30,7 +30,7 @@
 package deamont66.engine.rendering;
 
 import deamont66.engine.core.*;
-import deamont66.engine.rendering.resourceManagement.TextureResource;
+import deamont66.engine.rendering.resourceManagement.TextureData;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -40,8 +40,8 @@ import static org.lwjgl.opengl.GL13.*;
 
 public class Texture {
 
-	private static final HashMap<String, TextureResource> loadedTextures = new HashMap<>();
-	private final TextureResource resource;
+	private static final HashMap<String, TextureData> loadedTextures = new HashMap<>();
+	private final TextureData resource;
 	private final String fileName;
 
 	public Texture(String fileName) {
@@ -70,7 +70,7 @@ public class Texture {
 
 	public Texture(String fileName, int textureTarget, int filter, int internalFormat, int format, boolean clamp, int attachment) {
 		this.fileName = fileName;
-		TextureResource oldResource = loadedTextures.get(fileName);
+		TextureData oldResource = loadedTextures.get(fileName);
 
 		if (oldResource != null) {
 			resource = oldResource;
@@ -118,7 +118,7 @@ public class Texture {
 	}
 
 	public Texture(int width, int height, ByteBuffer data, int textureTarget, int filter, int internalFormat, int format, boolean clamp, int attachment) {
-		resource = new TextureResource(textureTarget, width, height, new ByteBuffer[]{data}, new int[]{filter}, new int[]{internalFormat}, new int[]{format}, clamp, new int[] {attachment});
+		resource = new TextureData(textureTarget, width, height, new ByteBuffer[]{data}, new int[]{filter}, new int[]{internalFormat}, new int[]{format}, clamp, new int[] {attachment});
 		fileName = "";
 	}
 
@@ -143,7 +143,7 @@ public class Texture {
 		resource.bindAsRenderTarget();
 	}
 
-	private TextureResource loadTexture(String fileName, int textureTarget, int filter, int internalFormat, int format, boolean clamp, int attachment) {
+	private TextureData loadTexture(String fileName, int textureTarget, int filter, int internalFormat, int format, boolean clamp, int attachment) {
 		try {
 			BufferedImage image = ImageIO.read(Texture.class.getResourceAsStream("/res/textures/" + fileName));
 			int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
@@ -168,7 +168,7 @@ public class Texture {
 
 			buffer.flip();
 
-			return new TextureResource(textureTarget, image.getWidth(), image.getHeight(), new ByteBuffer[]{buffer}, new int[]{filter}, new int[]{internalFormat}, new int[]{format}, clamp, new int[] {attachment});
+			return new TextureData(textureTarget, image.getWidth(), image.getHeight(), new ByteBuffer[]{buffer}, new int[]{filter}, new int[]{internalFormat}, new int[]{format}, clamp, new int[] {attachment});
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

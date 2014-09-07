@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#version 120
-
-attribute vec3 position;
-attribute vec2 texCoord;
+ 
+#include "common.glh"
 
 varying vec2 texCoord0;
 
-uniform mat4 transform;
+#if defined(VS_BUILD)
+attribute vec3 position;
+attribute vec2 texCoord;
+
+uniform mat4 T_MVP;
 
 void main()
 {
-    gl_Position = transform * vec4(position, 1.0);
-    texCoord0 = texCoord;
+    gl_Position = T_MVP * vec4(position, 1.0);
+    texCoord0 = texCoord; 
 }
+
+#elif defined(FS_BUILD)
+uniform sampler2D diffuse;
+
+DeclareFragOutput(0, vec4);
+void main()
+{
+	SetFragOutput(0, texture2D(diffuse, texCoord0));
+}
+#endif

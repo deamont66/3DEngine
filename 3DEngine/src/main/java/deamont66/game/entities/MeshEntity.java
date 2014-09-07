@@ -27,65 +27,47 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.components;
 
-import deamont66.engine.core.CoreEngine;
+package deamont66.game.entities;
+
+import deamont66.engine.components.MeshRenderer;
+import deamont66.engine.core.Entity;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
-import deamont66.engine.rendering.Shader;
-import deamont66.engine.rendering.ShadowCameraTransform;
-import deamont66.engine.rendering.ShadowInfo;
+import deamont66.engine.rendering.Material;
+import deamont66.engine.rendering.Mesh;
 
-public class BaseLight extends EntityComponent {
-
-	private Vector3f    m_color;
-	private float       m_intensity;
-	private Shader      m_shader;
-	private boolean     m_active;
-	private ShadowInfo  m_shadowInfo;
-
-	public BaseLight(Vector3f color, float intensity, Shader shader) {
-		this.m_color = color;
-		this.m_intensity = intensity;
-                this.m_shader = shader;
-		this.m_active = true;
-		this.m_shadowInfo = new ShadowInfo();
-	}
-
-        public ShadowCameraTransform calcShadowCameraTransform(Vector3f mainCameraPos, Quaternion mainCameraRot) {
-            return new ShadowCameraTransform(getTransform().getTransformedPos(), getTransform().getTransformedRot());
-        }
-        
-	@Override
-	public void addToEngine(CoreEngine engine) {
-		engine.getRenderingEngine().addLight(this);
-	}
-
-	public Shader getShader() {
-		return m_shader;
-	}
-
-	public Vector3f getColor() {
-		return m_color;
-	}
-
-	public float getIntensity() {
-		return m_intensity;
-	}
-
-	public boolean isActive() {
-		return m_active;
-	}
-
-	public void setActive(boolean active) {
-		this.m_active = active;
-	}
-
-	public ShadowInfo getShadowInfo() {
-		return m_shadowInfo;
-	}
-
-	protected void setShadowInfo(ShadowInfo shadowInfo) {
-		this.m_shadowInfo = shadowInfo;
-	}
+/**
+ *
+ * @author JiriSimecek
+ */
+public class MeshEntity extends Entity {
+    
+    
+    public MeshEntity(Mesh mesh, Material material) {
+        this(mesh, material, null, null, null);
+    }
+    
+    public MeshEntity(Mesh mesh, Material material, Vector3f pos) {
+        this(mesh, material, pos, null, null);
+    }
+    
+    public MeshEntity(Mesh mesh, Material material, Vector3f pos, Quaternion rot) {
+        this(mesh, material, pos, rot, null);
+    }
+    
+    public MeshEntity(Mesh mesh, Material material, Vector3f pos, Quaternion rot, Vector3f scale) {
+        super();
+        addMesh(mesh, material, pos, rot, scale);
+    }
+    
+    private void addMesh(Mesh mesh, Material material, Vector3f pos, Quaternion rot, Vector3f scale) {
+        addComponent(new MeshRenderer(mesh, material));
+        if(pos != null)
+            getTransform().getPos().set(pos);
+        if(rot != null)
+            getTransform().getRot().set(rot);
+        if(scale != null)
+            getTransform().getScale().set(scale);
+    }
 }

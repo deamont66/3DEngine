@@ -27,65 +27,33 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
+
 package deamont66.engine.components;
 
 import deamont66.engine.core.CoreEngine;
-import deamont66.engine.core.math.Quaternion;
-import deamont66.engine.core.math.Vector3f;
+import deamont66.engine.core.Entity;
+import deamont66.engine.rendering.Renderer;
+import deamont66.engine.core.Transform;
 import deamont66.engine.rendering.Shader;
-import deamont66.engine.rendering.ShadowCameraTransform;
-import deamont66.engine.rendering.ShadowInfo;
 
-public class BaseLight extends EntityComponent {
+public abstract class EntityComponent
+{
+	private Entity parent;
 
-	private Vector3f    m_color;
-	private float       m_intensity;
-	private Shader      m_shader;
-	private boolean     m_active;
-	private ShadowInfo  m_shadowInfo;
+	public void processInput(float delta) {}
+	public void update(float delta) {}
+	public void render(Shader shader, Renderer renderingEngine, Camera camera) {}
 
-	public BaseLight(Vector3f color, float intensity, Shader shader) {
-		this.m_color = color;
-		this.m_intensity = intensity;
-                this.m_shader = shader;
-		this.m_active = true;
-		this.m_shadowInfo = new ShadowInfo();
+	public void setParent(Entity parent)
+	{
+		this.parent = parent;
 	}
 
-        public ShadowCameraTransform calcShadowCameraTransform(Vector3f mainCameraPos, Quaternion mainCameraRot) {
-            return new ShadowCameraTransform(getTransform().getTransformedPos(), getTransform().getTransformedRot());
-        }
-        
-	@Override
-	public void addToEngine(CoreEngine engine) {
-		engine.getRenderingEngine().addLight(this);
+	public Transform getTransform()
+	{
+		return parent.getTransform();
 	}
 
-	public Shader getShader() {
-		return m_shader;
-	}
-
-	public Vector3f getColor() {
-		return m_color;
-	}
-
-	public float getIntensity() {
-		return m_intensity;
-	}
-
-	public boolean isActive() {
-		return m_active;
-	}
-
-	public void setActive(boolean active) {
-		this.m_active = active;
-	}
-
-	public ShadowInfo getShadowInfo() {
-		return m_shadowInfo;
-	}
-
-	protected void setShadowInfo(ShadowInfo shadowInfo) {
-		this.m_shadowInfo = shadowInfo;
-	}
+	public void addToEngine(CoreEngine engine) {}
 }
+
