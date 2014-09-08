@@ -59,7 +59,6 @@ import deamont66.engine.rendering.Texture;
 import deamont66.engine.rendering.Window;
 import deamont66.game.entities.LightEntity;
 import deamont66.game.entities.MeshEntity;
-import org.lwjgl.opengl.Display;
 
 /**
  *
