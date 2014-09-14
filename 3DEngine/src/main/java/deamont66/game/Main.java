@@ -43,9 +43,9 @@ public class Main {
         Debug.ENABLE_NORMAL_MAP = true;
         Debug.ENABLE_PARALLAX_MAP = true;
         
-        CoreEngine engine = new CoreEngine(1280, 720, 120, true);
+        CoreEngine engine = new CoreEngine(1280, 720, 60, true);
         engine.setRenderer(LWJGLRenderer.class);
-        engine.setGame(PhysicsTestGame.class);
+        engine.setGame(MyGame.class);
         engine.createWindow();
         engine.start();
         System.exit(0);

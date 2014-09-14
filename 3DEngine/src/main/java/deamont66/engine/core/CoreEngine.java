@@ -49,6 +49,8 @@ public class CoreEngine
 	private final int height;
 	private final double frameTime;
         private final boolean vsync;
+        
+        private int fps;
 	
 	public CoreEngine() {
                 this(640, 480, 60, false);
@@ -58,6 +60,7 @@ public class CoreEngine
                 this.isRunning = false;
                 this.width = width;
                 this.height = height;
+                this.fps = (int) framerate;
                 this.frameTime = 1.0 / framerate;
                 this.vsync = vsync;
         }
@@ -106,7 +109,7 @@ public class CoreEngine
 		isRunning = true;
 		
 		int frames = 0;
-		long frameCounter = 0;
+		double frameCounter = 0;
 
 		game.init();
 
@@ -133,21 +136,20 @@ public class CoreEngine
 				if(Window.isCloseRequested())
 					stop();
 
-				game.processInput((float)frameTime);
-				Input.update();
-				
-				game.update((float)frameTime);
+				game.processInputAll((float)frameTime);
+				game.updateAll((float)frameTime);
+                                Input.update();
 				
 				if(frameCounter >= 1.0)
 				{
-					System.out.println(frames);
-					frames = 0;
+                                        fps = frames;
+                                        frames = 0;
 					frameCounter = 0;
 				}
 			}
 			if(render)
 			{
-				game.render(renderer);
+				game.renderAll(renderer);
 				Window.render();
 				frames++;
 			}
@@ -176,6 +178,10 @@ public class CoreEngine
 	public Renderer getRenderingEngine() {
 		return renderer;
 	}
+
+        public int getFps() {
+                return fps;
+        }
         
         public void setGame(Class<? extends Game> aClass) {
             gameClass = aClass;

@@ -27,46 +27,140 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.core;
 
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.nulldevice.NullSoundDevice;
+import de.lessvoid.nifty.renderer.lwjgl.input.LwjglInputSystem;
+import de.lessvoid.nifty.renderer.lwjgl.render.LwjglRenderDevice;
+import de.lessvoid.nifty.spi.time.impl.FastTimeProvider;
 import deamont66.engine.rendering.Renderer;
+import deamont66.engine.rendering.Window;
 
-public abstract class Game
-{
-	private Entity root;
+public abstract class Game {
 
-	public void init() {}
+    private Entity root;
+    private Nifty gui;
+    private LwjglInputSystem inputSystem;
+    private CoreEngine engine;
+    private GameState currentState;
 
-	public void processInput(float delta)
-	{
-		getRootObject().processInputAll(delta);
-	}
+    public void setGameState(final Class<? extends GameState> state) {
+        try {
+            GameState newState = state.getConstructor(Game.class).newInstance(Game.this);
+            if (currentState != null) {
+                root = getRootObject(true);
+                engine.getRenderingEngine().clearLights();
+                currentState.cleanUp();
+            }
+            currentState = newState;
+            currentState.init();
+        } catch (Exception ex) {
+            System.err.println("Cannot change gameState to " + state.getName());
+        }
+    }
 
-	public void update(float delta)
-	{
-		getRootObject().updateAll(delta);
-	}
+    protected void initGUI() {
+        inputSystem = new LwjglInputSystem();
+        try {
+            inputSystem.startup();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        gui = new Nifty(
+                new LwjglRenderDevice(),
+                new NullSoundDevice(),
+                inputSystem,
+                new FastTimeProvider());
+        // load default styles
+        gui.loadStyleFile("nifty-default-styles.xml");
+        // load standard controls
+        gui.loadControlFile("nifty-default-controls.xml");
+    }
 
-	public void render(Renderer renderer)
-	{
-		renderer.render(getRootObject());
-	}
+    protected void processInputAll(float delta) {
+        getRootObject().processInputAll(delta);
+        processInput(delta);
+        if (currentState != null) {
+            currentState.processInput(delta);
+        }
+    }
 
-	public void addToScene(Entity object)
-	{
-		getRootObject().addChild(object);
-	}
+    protected void updateAll(float delta) {
+        getRootObject().updateAll(delta);
+        if (gui != null) {
+            if (gui.update()) {
+                // nothing yet
+            }
+        }
+        update(delta);
+        if (currentState != null) {
+            currentState.update(delta);
+        }
+    }
 
-	private Entity getRootObject()
-	{
-		if(root == null)
-			root = new Entity();
+    protected void renderAll(Renderer renderer) {
+        renderer.render(getRootObject());
+        if (gui != null) {
+            renderer.to2D(Window.getWidth(), Window.getHeight());
+            try {
+                gui.render(false);
+            } catch (Exception e) {
+            }
+            renderer.backTo3D();
+        }
+        render(renderer);
+        if (currentState != null) {
+            currentState.render(renderer);
+        }
+    }
 
-		return root;
-	}
+    public void cleanUp() {
+        inputSystem.shutdown();
+        if (currentState != null) {
+            currentState.cleanUp();
+        }
+    }
 
-	public void setEngine(CoreEngine engine) { getRootObject().setEngine(engine); }
+    protected abstract void init();
 
-        public void cleanUp() {}
+    protected abstract void processInput(float delta);
+
+    protected abstract void render(Renderer renderer);
+
+    protected abstract void update(float delta);
+
+    protected void addToScene(Entity object) {
+        getRootObject().addChild(object);
+    }
+
+    /**
+     * Sets {@link CoreEngine} for root entity.
+     *
+     * @param engine
+     */
+    public void setEngine(CoreEngine engine) {
+        this.engine = engine;
+        getRootObject().setEngine(engine);
+    }
+
+    public Nifty getGui() {
+        return gui;
+    }
+
+    public CoreEngine getEngine() {
+        return engine;
+    }
+
+    private Entity getRootObject() {
+        return getRootObject(root == null);
+    }
+
+    private Entity getRootObject(boolean reset) {
+        if (reset) {
+            root = new Entity();
+            root.setEngine(engine);
+        }
+        return root;
+    }
 }

@@ -55,7 +55,7 @@ public class TextureData extends ReferenceCounter {
         this.height = height;
         this.frameBuffer = 0;
         initTextures(buffers, filters, internalFormat, format, clamp);
-        intiRenderTarget(attachments);
+        initRenderTarget(attachments);
     }
 
     private void initTextures(ByteBuffer[] buffers, int[] filters, int[] internalFormat, int[] format, boolean clamp) {
@@ -87,7 +87,7 @@ public class TextureData extends ReferenceCounter {
         }
     }
 
-    private void intiRenderTarget(int[] attachments) {
+    private void initRenderTarget(int[] attachments) {
         if (attachments == null) {
             return;
         }
@@ -130,8 +130,8 @@ public class TextureData extends ReferenceCounter {
             glDrawBuffers(drawBuffers[i]);
         }
         
-//        glDrawBuffer(GL_NONE);
-//	glReadBuffer(GL_NONE);
+        glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
         
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             new Exception("Framebuffer creations failure. Error Code: " + glCheckFramebufferStatus(GL_FRAMEBUFFER)).printStackTrace();

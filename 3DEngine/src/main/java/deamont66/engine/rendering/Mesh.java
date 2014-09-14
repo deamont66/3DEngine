@@ -31,6 +31,7 @@ package deamont66.engine.rendering;
 
 import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.rendering.meshLoading.IndexedModel;
+import deamont66.engine.rendering.meshLoading.NewOBJModel;
 import deamont66.engine.rendering.meshLoading.OBJModel;
 import deamont66.engine.rendering.resourceManagement.MeshData;
 import java.util.HashMap;

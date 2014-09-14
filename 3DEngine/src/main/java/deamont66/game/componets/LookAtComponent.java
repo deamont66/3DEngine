@@ -28,12 +28,31 @@
  * 
  */
 
-package deamont66.game;
+package deamont66.game.componets;
 
-/**
- *
- * @author JiriSimecek
- */
-public abstract class GlobalConstants {
-    public static final int RENDER_LIGHT_RANGE = 50;
+import deamont66.engine.components.EntityComponent;
+import deamont66.engine.core.math.Vector3f;
+import deamont66.engine.core.math.Quaternion;
+import deamont66.engine.core.*;
+
+public class LookAtComponent extends EntityComponent {
+
+    private final Transform lookAt;
+
+    public LookAtComponent(Entity lookAtObject) {
+        lookAt = lookAtObject.getTransform();
+    }
+    
+    public LookAtComponent(EntityComponent lookAtComponent) {
+        lookAt = lookAtComponent.getTransform();
+    }
+
+    @Override
+    public void update(float delta) {
+        Quaternion newRot = getTransform().getLookAtRotation(lookAt.getTransformedPos(),
+                new Vector3f(0, 1, 0));
+
+        //getTransform().setRot(getTransform().getRot().nlerp(newRot, delta * 5.0f, true));
+        getTransform().setRot(getTransform().getRot().slerp(newRot, delta * 5.0f, true));
+    }
 }

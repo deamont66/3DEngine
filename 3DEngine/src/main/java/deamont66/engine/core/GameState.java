@@ -27,48 +27,34 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.rendering;
 
-import deamont66.engine.components.BaseLight;
-import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
-import deamont66.engine.core.Transform;
-import deamont66.engine.core.math.Matrix4f;
-import deamont66.engine.rendering.resourceManagement.MappedValues;
+package deamont66.engine.core;
 
-public abstract class Renderer extends MappedValues {
+import deamont66.engine.rendering.Renderer;
 
-    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
+/**
+ *
+ * @author JiriSimecek
+ */
+public abstract class GameState {
 
-    public abstract void render(Entity object);
+    private final Game game;
 
-    public abstract String getRendererVersion();
-
-    public abstract Camera getMainCamera();
-
-    public abstract void setMainCamera(Camera mainCamera);
-
-    public void addLight(BaseLight light) {
+    public GameState(Game game) {
+        this.game = game;
     }
     
-    public void clearLights() {
+    protected void changeGameState(Class<? extends GameState> state) {
+        game.setGameState(state);
     }
-
-    public int getSamplerSlot(String samplerName) {
-        return 0;
-    }
-
-    public BaseLight getActiveLight() {
-        return null;
-    }
-
-    public Matrix4f getLightMatrix() {
-        return new Matrix4f();
-    }
-
-    public void to2D(int width, int height) {
-    }
-
-    public void backTo3D() {
-    }
+    
+    protected abstract void init();
+    protected abstract void processInput(float delta);
+    protected abstract void update(float delta);
+    protected abstract void render(Renderer renderer);
+    protected void cleanUp() {}
+    
+    protected void addToScene(Entity object) {
+        game.addToScene(object);
+    }    
 }

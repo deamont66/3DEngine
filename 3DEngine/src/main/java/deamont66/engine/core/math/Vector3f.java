@@ -202,5 +202,5 @@ public class Vector3f extends javax.vecmath.Vector3f {
 
     public static Vector3f zeros() {
         return new Vector3f(0f, 0f, 0f);
-    }
+    }  
 }

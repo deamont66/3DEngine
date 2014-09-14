@@ -1,0 +1,12 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl _4eb49e2_dds
+Ns 3.921569
+Ka 0.000000 0.000000 0.000000
+Kd 0.446745 0.446745 0.446745
+Ks 0.901961 0.901961 0.901961
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 14EB49E2.jpg

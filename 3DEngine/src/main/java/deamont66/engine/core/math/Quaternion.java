@@ -299,4 +299,8 @@ public class Quaternion extends javax.vecmath.Quat4f
 	{
 		return x == r.getX() && y == r.getY() && z == r.getZ() && w == r.getW();
 	}
+        
+        public static Quaternion noRotation() {
+            return new Quaternion();
+        }
 }

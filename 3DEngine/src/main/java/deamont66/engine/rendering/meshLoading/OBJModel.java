@@ -34,28 +34,42 @@ import deamont66.engine.core.math.Vector2f;
 import deamont66.engine.core.math.Vector3f;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class OBJModel {
 
-    private ArrayList<Vector3f> positions;
-    private ArrayList<Vector2f> texCoords;
-    private ArrayList<Vector3f> normals;
-    private ArrayList<OBJIndex> indices;
-    private boolean hasTexCoords;
-    private boolean hasNormals;
+    protected ArrayList<Vector3f> positions;
+    protected ArrayList<Vector2f> texCoords;
+    protected ArrayList<Vector3f> normals;
+    protected ArrayList<OBJIndex> indices;
+    protected boolean hasTexCoords;
+    protected boolean hasNormals;
 
-    public OBJModel(String fileName) {
+    /**
+     * Generates empty OBJModel. Only for extetending purposes, we are
+     * recomending to use {@link #OBJModel(java.lang.String) } constructor
+     * instead.
+     */
+    public OBJModel() {
         positions = new ArrayList<>();
         texCoords = new ArrayList<>();
         normals = new ArrayList<>();
         indices = new ArrayList<>();
         hasTexCoords = false;
         hasNormals = false;
+    }
 
+    /**
+     * Loads .obj model into game engine. Use {@link #toIndexedModel() } to get
+     * optimazed model for rendering.
+     *
+     * @param fileName .obj file to load
+     */
+    public OBJModel(String fileName) {
+        this();
+        
         BufferedReader meshReader;
 
         try {
@@ -90,8 +104,8 @@ public class OBJModel {
 
             meshReader.close();
         } catch (Exception e) {
-            new Exception("Error while loading OBJ file: " + fileName).printStackTrace();
-            System.exit(1);
+            throw new RuntimeException("Error while loading OBJ file: " + fileName);
+
         }
     }
 

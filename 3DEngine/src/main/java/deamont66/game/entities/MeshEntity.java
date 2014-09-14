@@ -38,7 +38,7 @@ import deamont66.engine.rendering.Material;
 import deamont66.engine.rendering.Mesh;
 
 /**
- *
+ * Entity with connected {@link Mesh}.
  * @author JiriSimecek
  */
 public class MeshEntity extends Entity {
@@ -70,4 +70,35 @@ public class MeshEntity extends Entity {
         if(scale != null)
             getTransform().getScale().set(scale);
     }
+    
+    /**
+     * Overloads {@link #updateTransform(com.bulletphysics.linearmath.Transform, deamont66.engine.core.math.Vector3f, deamont66.engine.core.math.Quaternion) }
+     * @param sourceTransform 
+     */
+    public void updateTransform(com.bulletphysics.linearmath.Transform sourceTransform) {
+        updateTransform(sourceTransform, Vector3f.zeros(), Quaternion.noRotation());
+    }
+    
+    /**
+     * Overloads {@link #updateTransform(com.bulletphysics.linearmath.Transform, deamont66.engine.core.math.Vector3f, deamont66.engine.core.math.Quaternion) }
+     * @param sourceTransform
+     * @param offset 
+     */
+    public void updateTransform(com.bulletphysics.linearmath.Transform sourceTransform, Vector3f offset) {
+        updateTransform(sourceTransform, offset, Quaternion.noRotation());
+    }
+    
+    /**
+     * Updates entity transform from jBullet transform object. Usualy updates entity position to physics body position.
+     * @param sourceTransform jBullet transform object
+     * @param offsetPos position offset between entity and jBullet transform
+     * @param offsetRot rotation offset between entity and jBullet transform
+     */
+    public void updateTransform(com.bulletphysics.linearmath.Transform sourceTransform, Vector3f offsetPos, Quaternion offsetRot) {
+        getTransform().setPos(new Vector3f(sourceTransform.origin).add(offsetPos));
+        Quaternion rotation = (Quaternion) sourceTransform.getRotation(new Quaternion());
+        rotation.mul(offsetRot);
+        getTransform().setRot(rotation);
+    }
+ 
 }

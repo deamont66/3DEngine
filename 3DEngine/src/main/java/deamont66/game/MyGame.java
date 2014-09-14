@@ -27,48 +27,47 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.rendering;
+package deamont66.game;
 
-import deamont66.engine.components.BaseLight;
-import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
-import deamont66.engine.core.Transform;
-import deamont66.engine.core.math.Matrix4f;
-import deamont66.engine.rendering.resourceManagement.MappedValues;
+import de.lessvoid.nifty.elements.render.TextRenderer;
+import deamont66.engine.core.Game;
+import deamont66.engine.core.Input;
+import deamont66.engine.rendering.Renderer;
+import deamont66.engine.rendering.Window;
+import deamont66.game.states.PhysicsTestState;
+import org.lwjgl.LWJGLException;
 
-public abstract class Renderer extends MappedValues {
+/**
+ *
+ * @author JiriSimecek
+ */
+public class MyGame extends Game {
 
-    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
-
-    public abstract void render(Entity object);
-
-    public abstract String getRendererVersion();
-
-    public abstract Camera getMainCamera();
-
-    public abstract void setMainCamera(Camera mainCamera);
-
-    public void addLight(BaseLight light) {
-    }
-    
-    public void clearLights() {
+    @Override
+    public void init() {
+        Window.setTitle("Physics test");
+        initGUI();
+        getGui().fromXml("test.xml", "ingame");
+        setGameState(PhysicsTestState.class);
     }
 
-    public int getSamplerSlot(String samplerName) {
-        return 0;
+    @Override
+    public void processInput(float delta) {
+        if (Input.getKeyDown(Input.KEY_F11)) {
+            try {
+                Window.setDisplayMode(Window.getWidth(), Window.getHeight(), !Window.isFullscreen());
+            } catch (LWJGLException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
-    public BaseLight getActiveLight() {
-        return null;
+    @Override
+    public void update(float delta) {
+        getGui().getCurrentScreen().findElementById("fps").getRenderer(TextRenderer.class).setText(getEngine().getFps() + " FPS");
     }
 
-    public Matrix4f getLightMatrix() {
-        return new Matrix4f();
-    }
-
-    public void to2D(int width, int height) {
-    }
-
-    public void backTo3D() {
+    @Override
+    protected void render(Renderer renderer) {
     }
 }

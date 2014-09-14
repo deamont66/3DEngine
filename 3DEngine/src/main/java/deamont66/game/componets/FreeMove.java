@@ -27,48 +27,52 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.rendering;
 
-import deamont66.engine.components.BaseLight;
-import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
-import deamont66.engine.core.Transform;
-import deamont66.engine.core.math.Matrix4f;
-import deamont66.engine.rendering.resourceManagement.MappedValues;
+package deamont66.game.componets;
 
-public abstract class Renderer extends MappedValues {
+import deamont66.engine.components.EntityComponent;
+import deamont66.engine.core.Input;
+import deamont66.engine.core.math.Vector3f;
 
-    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
+public class FreeMove extends EntityComponent
+{
+	private float speed;
+	private int forwardKey;
+	private int backKey;
+	private int leftKey;
+	private int rightKey;
 
-    public abstract void render(Entity object);
+	public FreeMove(float speed)
+	{
+		this(speed, Input.KEY_W, Input.KEY_S, Input.KEY_A, Input.KEY_D);
+	}
 
-    public abstract String getRendererVersion();
+	public FreeMove(float speed, int forwardKey, int backKey, int leftKey, int rightKey)
+	{
+		this.speed = speed;
+		this.forwardKey = forwardKey;
+		this.backKey = backKey;
+		this.leftKey = leftKey;
+		this.rightKey = rightKey;
+	}
 
-    public abstract Camera getMainCamera();
+	@Override
+	public void processInput(float delta)
+	{
+		float movAmt = speed * delta;
 
-    public abstract void setMainCamera(Camera mainCamera);
+		if(Input.getKey(forwardKey))
+			move(getTransform().getRot().getForward(), movAmt);
+		if(Input.getKey(backKey))
+			move(getTransform().getRot().getForward(), -movAmt);
+		if(Input.getKey(leftKey))
+			move(getTransform().getRot().getLeft(), movAmt);
+		if(Input.getKey(rightKey))
+			move(getTransform().getRot().getRight(), movAmt);
+	}
 
-    public void addLight(BaseLight light) {
-    }
-    
-    public void clearLights() {
-    }
-
-    public int getSamplerSlot(String samplerName) {
-        return 0;
-    }
-
-    public BaseLight getActiveLight() {
-        return null;
-    }
-
-    public Matrix4f getLightMatrix() {
-        return new Matrix4f();
-    }
-
-    public void to2D(int width, int height) {
-    }
-
-    public void backTo3D() {
-    }
+	private void move(Vector3f dir, float amt)
+	{
+		getTransform().setPos(getTransform().getPos().add(dir.mul(amt)));
+	}
 }

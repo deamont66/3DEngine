@@ -27,48 +27,66 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.rendering;
 
-import deamont66.engine.components.BaseLight;
-import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
-import deamont66.engine.core.Transform;
-import deamont66.engine.core.math.Matrix4f;
-import deamont66.engine.rendering.resourceManagement.MappedValues;
+package deamont66.game.componets;
 
-public abstract class Renderer extends MappedValues {
+import deamont66.engine.components.EntityComponent;
+import deamont66.engine.core.Input;
+import deamont66.engine.core.math.Vector2f;
+import deamont66.engine.core.math.Vector3f;
+import deamont66.engine.rendering.Window;
 
-    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
+public class FreeLook extends EntityComponent
+{
+	private static final Vector3f yAxis = new Vector3f(0,1,0);
 
-    public abstract void render(Entity object);
+	private boolean mouseLocked = false;
+	private float sensitivity;
+	private int unlockMouseKey;
 
-    public abstract String getRendererVersion();
+	public FreeLook(float sensitivity)
+	{
+		this(sensitivity, Input.KEY_ESCAPE);
+	}
 
-    public abstract Camera getMainCamera();
+	public FreeLook(float sensitivity, int unlockMouseKey)
+	{
+		this.sensitivity = sensitivity;
+		this.unlockMouseKey = unlockMouseKey;
+	}
 
-    public abstract void setMainCamera(Camera mainCamera);
+	@Override
+	public void processInput(float delta)
+	{
+		Vector2f centerPosition = new Vector2f(Window.getWidth()/2, Window.getHeight()/2);
 
-    public void addLight(BaseLight light) {
-    }
-    
-    public void clearLights() {
-    }
+		if(Input.getKey(unlockMouseKey))
+		{
+			Input.setCursor(true);
+			mouseLocked = false;
+		}
+		if(Input.getMouseDown(0))
+		{
+			Input.setMousePosition(centerPosition);
+			Input.setCursor(false);
+			mouseLocked = true;
+		}
 
-    public int getSamplerSlot(String samplerName) {
-        return 0;
-    }
+		if(mouseLocked)
+		{
+			Vector2f deltaPos = new Vector2f(Input.getMousePosition());
+                        deltaPos.sub(centerPosition);
 
-    public BaseLight getActiveLight() {
-        return null;
-    }
+			boolean rotY = deltaPos.getX() != 0;
+			boolean rotX = deltaPos.getY() != 0;
 
-    public Matrix4f getLightMatrix() {
-        return new Matrix4f();
-    }
+			if(rotY)
+				getTransform().rotate(yAxis, (float) Math.toRadians(deltaPos.getX() * sensitivity));
+			if(rotX)
+				getTransform().rotate(getTransform().getRot().getRight(), (float) Math.toRadians(-deltaPos.getY() * sensitivity));
 
-    public void to2D(int width, int height) {
-    }
-
-    public void backTo3D() {
-    }
+			if(rotY || rotX)
+				Input.setMousePosition(centerPosition);
+		}
+	}
 }

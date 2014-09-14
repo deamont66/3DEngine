@@ -14,8 +14,16 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <natives.version>0.0.6</natives.version>
+        <nifty.version>1.4.0</nifty.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>nifty-maven-repo.sourceforge.net</id>
+            <url>http://nifty-gui.sourceforge.net/nifty-maven-repo</url>
+        </repository>
+    </repositories>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
@@ -51,6 +59,31 @@
             <groupId>cz.advel.jbullet</groupId>
             <artifactId>jbullet</artifactId>
             <version>20101010-1</version>
+        </dependency>
+        <dependency>
+            <groupId>ObjImport</groupId>
+            <artifactId>ObjImport</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>lessvoid</groupId>
+            <artifactId>nifty</artifactId>
+            <version>${nifty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>lessvoid</groupId>
+            <artifactId>nifty-lwjgl-renderer</artifactId>
+            <version>${nifty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>lessvoid</groupId>
+            <artifactId>nifty-default-controls</artifactId>
+            <version>${nifty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>lessvoid</groupId>
+            <artifactId>nifty-style-black</artifactId>
+            <version>${nifty.version}</version>
         </dependency>
     </dependencies>
 

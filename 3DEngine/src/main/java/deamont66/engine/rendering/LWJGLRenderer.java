@@ -35,13 +35,15 @@ import deamont66.engine.components.Camera;
 import deamont66.engine.components.PointLight;
 import deamont66.engine.core.Debug;
 import deamont66.engine.core.Entity;
+import static deamont66.engine.core.GlobalConstants.RENDER_LIGHT_RANGE;
 import deamont66.engine.core.Transform;
 import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
-import static deamont66.engine.core.GlobalConstants.RENDER_LIGHT_RANGE;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -53,8 +55,10 @@ import static org.lwjgl.opengl.GL11.GL_EQUAL;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_LESS;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_VERSION;
@@ -68,6 +72,16 @@ import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glFrontFace;
 import static org.lwjgl.opengl.GL11.glGetString;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.glPopAttrib;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushAttrib;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_RG32F;
 
@@ -143,9 +157,9 @@ public class LWJGLRenderer extends Renderer {
         glEnable(GL_DEPTH_TEST);
 //        glEnable(GL_DEPTH_CLAMP);
 	//glEnable(GL_MULTISAMPLE);
-	//glEnable(GL_FRAMEBUFFER_SRGB);
+//	glEnable(GL_FRAMEBUFFER_SRGB);
 
-        // glEnable(GL_TEXTURE_2D);
+//         glEnable(GL_TEXTURE_2D);
         m_tempTarget = new Texture(Window.getWidth(), Window.getHeight(), null, GL_TEXTURE_2D, GL_NEAREST, GL_RGBA, GL_RGBA, false, GL_COLOR_ATTACHMENT0);
         
         m_planeMaterial = new Material();
@@ -340,6 +354,11 @@ public class LWJGLRenderer extends Renderer {
     }
 
     @Override
+    public void clearLights() {
+        m_lights.clear();
+    }
+    
+    @Override
     public int getSamplerSlot(String samplerName) {
         return m_samplerMap.get(samplerName);
     }
@@ -366,5 +385,34 @@ public class LWJGLRenderer extends Renderer {
     @Override
     public Matrix4f getLightMatrix() {
         return m_lightMatrix;
+    }
+    
+    @Override
+    public void to2D(int width, int height) {
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_CULL_FACE);
+        glMatrixMode(GL_PROJECTION);                        // Select The Projection Matrix
+        glPushMatrix();                                     // Store The Projection Matrix
+        glLoadIdentity();                                   // Reset The Projection Matrix
+        glOrtho(0, width, height, 0, 1, -1);                // Set Up An Ortho Screen
+        glMatrixMode(GL_MODELVIEW);                         // Select The Modelview Matrix
+        glPushMatrix();                                     // Store The Modelview Matrix
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glLoadIdentity();                                   // Reset The Modelview Matrix
+        glUseProgram(0);
+        glActiveTexture(GL_TEXTURE0);
+    }
+    
+    @Override
+    public void backTo3D() {
+        glMatrixMode(GL_PROJECTION);                        // Select The Projection Matrix
+        glPopMatrix();                                      // Restore The Old Projection Matrix
+        glMatrixMode(GL_MODELVIEW);                         // Select The Modelview Matrix
+        glPopAttrib();
+        glPopMatrix();                                      // Restore The Old Projection Matrix
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_CULL_FACE);
     }
 }

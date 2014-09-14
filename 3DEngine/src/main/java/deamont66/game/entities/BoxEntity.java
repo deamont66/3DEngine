@@ -27,48 +27,41 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.engine.rendering;
+package deamont66.game.entities;
 
-import deamont66.engine.components.BaseLight;
-import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
-import deamont66.engine.core.Transform;
-import deamont66.engine.core.math.Matrix4f;
-import deamont66.engine.rendering.resourceManagement.MappedValues;
+import deamont66.engine.core.math.Quaternion;
+import deamont66.engine.core.math.Vector3f;
+import deamont66.engine.rendering.Material;
+import deamont66.engine.rendering.Mesh;
 
-public abstract class Renderer extends MappedValues {
+/**
+ *
+ * @author JiriSimecek
+ */
+public class BoxEntity extends MeshEntity {
 
-    public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
-
-    public abstract void render(Entity object);
-
-    public abstract String getRendererVersion();
-
-    public abstract Camera getMainCamera();
-
-    public abstract void setMainCamera(Camera mainCamera);
-
-    public void addLight(BaseLight light) {
-    }
-    
-    public void clearLights() {
+    public BoxEntity(Vector3f size) {
+        this(size, null, null, null);
     }
 
-    public int getSamplerSlot(String samplerName) {
-        return 0;
+    public BoxEntity(Vector3f size, Material material) {
+        this(size, material, null, null);
     }
 
-    public BaseLight getActiveLight() {
-        return null;
+    public BoxEntity(Vector3f size, Material material, Vector3f position) {
+        this(size, material, position, null);
     }
 
-    public Matrix4f getLightMatrix() {
-        return new Matrix4f();
+    public BoxEntity(Vector3f size, Material material, Vector3f position, Quaternion rotation) {
+        super(new Mesh("cube.obj"), material, position, rotation, size);
     }
 
-    public void to2D(int width, int height) {
+    public Vector3f getSize() {
+        return getTransform().getScale();
     }
 
-    public void backTo3D() {
+    public void setSize(Vector3f size) {
+        getTransform().setScale(size);
     }
+
 }
