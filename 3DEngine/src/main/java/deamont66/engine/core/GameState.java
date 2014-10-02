@@ -30,6 +30,7 @@
 
 package deamont66.engine.core;
 
+import deamont66.engine.components.Camera;
 import deamont66.engine.rendering.Renderer;
 
 /**
@@ -56,5 +57,9 @@ public abstract class GameState {
     
     protected void addToScene(Entity object) {
         game.addToScene(object);
-    }    
+    }
+    
+    protected void setCamera(Entity camera) {
+            game.setCamera(camera);
+    }
 }

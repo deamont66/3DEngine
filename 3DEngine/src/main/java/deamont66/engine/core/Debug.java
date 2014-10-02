@@ -36,6 +36,7 @@ package deamont66.engine.core;
  */
 public class Debug {
     public static boolean DEBUG_ECHO = false;
+    public static boolean DEBUG_TIMERS_ECHO = false;
     public static boolean ENABLE_LIGHTS = true;
     public static boolean ENABLE_SHADOWS = true;
     public static boolean ENABLE_SHADERS = true;

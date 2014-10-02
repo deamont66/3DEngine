@@ -5,7 +5,7 @@
     <screen id="ingame">
         <layer id="GLayer1" childLayout="absolute">
             <panel id="GPanel0" childLayout="horizontal" width="100%" x="1" y="3" height="20px">
-                <control name="label" id="fps" textLineHeight="20px" textMinHeight="20px" textHAlign="left" textVAlign="top" width="100%" x="0" y="0"  text="0 FPS" align="left" font="aurulent-sans-16.fnt" height="100%"/>
+                <control name="label" id="fpsLabel" textLineHeight="20px" textMinHeight="20px" textHAlign="left" textVAlign="top" width="100%" x="0" y="0"  text="0 FPS" align="left" font="aurulent-sans-16.fnt" height="100%"/>
             </panel>
         </layer>
     </screen>

@@ -31,7 +31,6 @@
 package deamont66.game.componets;
 
 import deamont66.engine.components.EntityComponent;
-import deamont66.engine.core.math.Vector3f;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.*;
 
@@ -49,8 +48,7 @@ public class LookAtComponent extends EntityComponent {
 
     @Override
     public void update(float delta) {
-        Quaternion newRot = getTransform().getLookAtRotation(lookAt.getTransformedPos(),
-                new Vector3f(0, 1, 0));
+        Quaternion newRot = getTransform().getLookAtRotation(lookAt.getTransformedPos());
 
         //getTransform().setRot(getTransform().getRot().nlerp(newRot, delta * 5.0f, true));
         getTransform().setRot(getTransform().getRot().slerp(newRot, delta * 5.0f, true));

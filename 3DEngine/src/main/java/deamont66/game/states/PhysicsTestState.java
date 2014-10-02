@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 - 2014, Jiří Šimeček
+ * Copyright (c) 2012 - 2014, JiĹ™Ă­ Ĺ imeÄŤek
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.game.states;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
@@ -59,6 +58,7 @@ import deamont66.engine.core.Entity;
 import deamont66.engine.core.Game;
 import deamont66.engine.core.GameState;
 import deamont66.engine.core.Input;
+import deamont66.engine.core.Scene;
 import deamont66.engine.core.Transform;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
@@ -67,11 +67,14 @@ import deamont66.engine.rendering.Mesh;
 import deamont66.engine.rendering.Renderer;
 import deamont66.engine.rendering.Texture;
 import deamont66.engine.rendering.Window;
+import deamont66.engine.rendering.meshLoading.OBJModel;
+import deamont66.game.PhysicUtils;
 import deamont66.game.componets.FreeLook;
 import deamont66.game.componets.FreeMove;
-import deamont66.game.entities.BoxEntity;
 import deamont66.game.entities.LightEntity;
+import deamont66.game.entities.Map;
 import deamont66.game.entities.MeshEntity;
+import deamont66.game.entities.physics.DynamicEntity;
 
 /**
  *
@@ -83,22 +86,14 @@ public class PhysicsTestState extends GameState {
 
     private DynamicsWorld dynamicsWorld;
 
-    private MeshEntity groundEntity;
-    private MeshEntity boxEntity;
-    private MeshEntity boxEntity2;
     private MeshEntity vehicleEntity;
     private MeshEntity[] wheelsEntities;
-
-    private RigidBody groundBody;
-    private RigidBody boxBody;
-    private RigidBody boxBody2;
     private RigidBody vehicleRigidBody;
-
     private RaycastVehicle vehicle;
 
     private int cameraMode = 0;
     private float steering = 0f;
-    
+
     public PhysicsTestState(Game game) {
         super(game);
     }
@@ -127,54 +122,82 @@ public class PhysicsTestState extends GameState {
 
         Material carMaterial = new Material();
         carMaterial.setTexture("diffuse", new Texture("car_1.jpg"));
+        carMaterial.setTexture("normalMap", new Texture("car_1_Normal.jpg"));
         carMaterial.setFloat("specularIntensity", 1);
         carMaterial.setFloat("specularPower", 8);
 
+        Material roadTestMaterial = new Material();
+        roadTestMaterial.setTexture("diffuse", new Texture("roads/road-asphalt.png"));
+        roadTestMaterial.setTexture("normalMap", new Texture("roads/road-asphalt_normal.png"));
+
         camera = new Camera((float) Math.toRadians(70.0f), (float) Window.getWidth() / (float) Window.getHeight(), 0.01f, 1000.0f);
-        addToScene(new Entity().addComponent(new FreeLook(0.5f)).addComponent(new FreeMove(10.0f)).addComponent(camera));
+        setCamera(new Entity().addComponent(new FreeLook(0.5f)).addComponent(new FreeMove(10.0f)).addComponent(camera));
         camera.getTransform().getPos().set(-5, 2, 5);
         camera.getTransform().setRot(new Quaternion(new Vector3f(0, 1, 0), (float) Math.toRadians(130)));
-
-        groundEntity = new BoxEntity(new Vector3f(50f, 0.1f, 50f), oldBricksMaterial, new Vector3f(0, -5f, 0));
-        addToScene(groundEntity);
-
-        boxEntity = new BoxEntity(new Vector3f(1f, 1f, 1f), brickMaterial, new Vector3f(0, 2, 0));
-        addToScene(boxEntity);
-
-        boxEntity2 = new BoxEntity(new Vector3f(1f, 1f, 1f), brickMaterial, new Vector3f(0, 8, 0.5f));
-        addToScene(boxEntity2);
 
         //        vehicleEntity = new BoxEntity(new Vector3f(1.f, 0.5f, 2.f), carMaterial, new Vector3f(0, 0, 0));       
         vehicleEntity = new MeshEntity(new Mesh("car_1.obj"), carMaterial, new Vector3f(0, 0, 0));
         addToScene(vehicleEntity);
-        
+
         wheelsEntities = new MeshEntity[4];
         for (int i = 0; i < wheelsEntities.length; i++) {
             wheelsEntities[i] = new MeshEntity(new Mesh("wheel_1.obj"), carMaterial);
             addToScene(wheelsEntities[i]);
         }
-        
+
         initPhysics(new Vector3f(0f, -10f, 0f));
+
+        Transform transform = new Transform();
+
+        transform.getPos().set(0, 2, 0);
+        CollisionShape boxShape = new BoxShape(new Vector3f(1, 1, 1));
+        DynamicEntity boxEntity = new DynamicEntity(100f, new Mesh("cube.obj"), boxShape, brickMaterial, transform);
+        boxEntity.addToWorld(dynamicsWorld);
+        addToScene(boxEntity);
+
+        transform.reset();
+        transform.getPos().set(0, 8, 0.5f);
+        boxEntity = new DynamicEntity(100f, new Mesh("cube.obj"), boxShape, brickMaterial, transform);
+        boxEntity.addToWorld(dynamicsWorld);
+        addToScene(boxEntity);
+
+        transform.reset();
+        transform.getPos().setY(-5f + .5f);
+        transform.getPos().setX(5);
+        DynamicEntity rampEntity = new DynamicEntity("ramp.obj", new OBJModel("/res/models/ramp.obj").toIndexedModel(), brickMaterial, transform);
+        rampEntity.addToWorld(dynamicsWorld);
+        addToScene(rampEntity);
+        
+        Map map = new Map();
+        map.setDynamicsWorld(dynamicsWorld);
+        addToScene(map);
+
+//        transform.reset();
+//        transform.setPos(new Vector3f(0, -5f, 0));
+//        groundEntity = new DynamicEntity(new Mesh("roads/road-flat.obj"), new BoxShape(new Vector3f(10f, 0.5f, 10f)), roadTestMaterial, transform);
+//        groundEntity.addToWorld(dynamicsWorld);
+//        addToScene(groundEntity);
 
         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0.5f, 0.5f, 0.5f), 0.6f, 5);
         addToScene(new LightEntity(directionalLight, new Vector3f(), new Quaternion(new Vector3f(1, 0, 0), (float) Math.toRadians(-45))));
+
     }
 
     @Override
     protected void processInput(float delta) {
-        if(Input.getKeyUp(Input.KEY_R)) {
+        if (Input.getKeyUp(Input.KEY_R)) {
             changeGameState(PhysicsTestState.class);
         }
-        
+
         if (Input.getKeyDown(Input.KEY_C)) {
             cameraMode += 1;
             cameraMode %= 3;
-            if(cameraMode == 0) {
-                camera.getTransform().getRot().set(0, 0, 0, 1);
+            if (cameraMode == 0) {
+                camera.getTransform().getRot().setZ(0);
             }
         }
 
-        float increment = 0.01f;
+        float increment = 0.05f;
         float clamp = 0.5f;
         if (Input.getKey(Input.KEY_LEFT)) {
             steering -= increment;
@@ -216,26 +239,27 @@ public class PhysicsTestState extends GameState {
     @Override
     protected void update(float delta) {
         com.bulletphysics.linearmath.Transform chassisWorldTransform = vehicle.getChassisWorldTransform(new com.bulletphysics.linearmath.Transform());
-        vehicleEntity.updateTransform(chassisWorldTransform, new Vector3f(0, 0.75f, 0));
+        vehicleEntity.updateTransform(chassisWorldTransform, new Vector3f(0, 0.8f, 0));
         for (int i = 0; i < vehicle.getNumWheels(); i++) {
-            Quaternion offset = Quaternion.noRotation();
+            Quaternion offset = Quaternion.identity();
             if (i == 1 || i == 2) {
                 offset = new Quaternion(new Vector3f(0, 0, 1), (float) Math.toRadians(180));
             }
-            wheelsEntities[i].updateTransform(vehicle.getWheelTransformWS(i, new com.bulletphysics.linearmath.Transform()), new Vector3f(0, 0, 0), offset);
+            wheelsEntities[i].updateTransform(vehicle.getWheelTransformWS(i, new com.bulletphysics.linearmath.Transform()), new Vector3f(0, -.25f, 0), offset);
         }
 
-        boxEntity.updateTransform(boxBody.getWorldTransform(new com.bulletphysics.linearmath.Transform()));
-        boxEntity2.updateTransform(boxBody2.getWorldTransform(new com.bulletphysics.linearmath.Transform()));
-
         if (cameraMode == 1 || cameraMode == 2) {
-            Transform tr = convertTransform(chassisWorldTransform);
-            Quaternion newRot = camera.getTransform().getLookAtRotation(tr.getTransformedPos(),
-                    new Vector3f(0, 1, 0));
+            Transform tr = PhysicUtils.convertTransform(chassisWorldTransform);
+            Quaternion newRot = new Quaternion();
+            newRot.lookAt(tr.getTransformedPos().sub(camera.getTransform().getPos()));
             if (cameraMode == 2) {
                 camera.getTransform().setPos(new Vector3f(chassisWorldTransform.origin).sub(tr.getRot().getForward().mul(10f)).add(new Vector3f(0, 8, 0)));
+                newRot = new Quaternion(tr.getRot());
+                newRot.mul(new Quaternion(new Vector3f(1, 0, 0), (float) Math.toRadians(30)));
+                camera.getTransform().setRot(newRot);
+            } else {
+                camera.getTransform().setRot(camera.getTransform().getRot().nlerp(newRot, delta * 5.0f, true));
             }
-            camera.getTransform().setRot(camera.getTransform().getRot().nlerp(newRot, delta * 5.0f, true));
         }
 
         vehicle.setSteeringValue(steering, 0);
@@ -247,7 +271,7 @@ public class PhysicsTestState extends GameState {
     @Override
     protected void render(Renderer renderer) {
     }
-    
+
     private void initPhysics(Vector3f gravity) {
         CollisionConfiguration collisionConfiguration = new DefaultCollisionConfiguration();
 
@@ -263,19 +287,6 @@ public class PhysicsTestState extends GameState {
 
         dynamicsWorld.setGravity(gravity);
 
-        // create a few basic rigid bodies
-        CollisionShape groundShape = new BoxShape(new Vector3f(50f, 0.1f, 50f));
-//        CollisionShape groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 0);
-        groundBody = createRigidBody(0, Vector3f.zeros(), groundEntity.getTransform(), groundShape);
-        dynamicsWorld.addRigidBody(groundBody);
-
-        CollisionShape boxShape = new BoxShape(new Vector3f(1, 1, 1));
-        boxBody = createRigidBody(100f, Vector3f.zeros(), boxEntity.getTransform(), boxShape);
-        dynamicsWorld.addRigidBody(boxBody);
-
-        boxBody2 = createRigidBody(100f, Vector3f.zeros(), boxEntity2.getTransform(), boxShape);
-        dynamicsWorld.addRigidBody(boxBody2);
-
         ///////////////////////////////////////////////////////////////////////
         //              Vehicle Setup
         ///////////////////////////////////////////////////////////////////////
@@ -284,11 +295,11 @@ public class PhysicsTestState extends GameState {
         float wheelWidth = 0.2f;
         float wheelFriction = 3;//1e30f;
         float suspensionStiffness = 40.f;
-        float suspensionDamping = 2.3f;
+        float suspensionDamping = 3.3f;
         float suspensionCompression = 8.4f;
         float rollInfluence = 0.1f;//1.0f;
 
-        float suspensionRestLength = 0.6f;
+        float suspensionRestLength = 0.3f;
         VehicleTuning vehicleTuning = new VehicleTuning();
         int CUBE_HALF_EXTENT = 1;
         Vector3f wheelDirectionCS0 = new Vector3f(0, -1, 0);
@@ -299,10 +310,10 @@ public class PhysicsTestState extends GameState {
 
         Transform localTrans = new Transform();
         localTrans.getPos().set(0, 1, 0);
-        vehicleBody.addChildShape(convertTransform(localTrans), vehicleChassisShape);
+        vehicleBody.addChildShape(PhysicUtils.convertTransform(localTrans), vehicleChassisShape);
 
         localTrans.getPos().set(3, 0, 0);
-        MotionState vehicleMotionState = new DefaultMotionState(convertTransform(localTrans));
+        MotionState vehicleMotionState = new DefaultMotionState(PhysicUtils.convertTransform(localTrans));
 
         Vector3f vehicleInertia = new Vector3f(0, 0, 0);
         vehicleBody.calculateLocalInertia(vehicleMass, vehicleInertia);
@@ -350,40 +361,4 @@ public class PhysicsTestState extends GameState {
             }
         }
     }
-
-    private RigidBody createRigidBody(float mass, Transform t, CollisionShape shape) {
-        return createRigidBody(mass, Vector3f.zeros(), t, shape);
-    }
-
-    private RigidBody createRigidBody(float mass, Vector3f localInertia, Transform transform, CollisionShape shape) {
-        if (mass != 0f) {
-            shape.calculateLocalInertia(mass, localInertia);
-        }
-
-        com.bulletphysics.linearmath.Transform t = new com.bulletphysics.linearmath.Transform();
-        t.setIdentity();
-        t.setRotation(transform.getTransformedRot());
-        t.origin.set(transform.getTransformedPos());
-
-        // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-        DefaultMotionState myMotionState = new DefaultMotionState(t);
-        RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
-        return new RigidBody(rbInfo);
-    }
-
-    private com.bulletphysics.linearmath.Transform convertTransform(Transform t) {
-        com.bulletphysics.linearmath.Transform tr = new com.bulletphysics.linearmath.Transform();
-        tr.setIdentity();
-        tr.origin.set(t.getPos());
-        tr.setRotation(t.getRot());
-        return tr;
-    }
-
-    private Transform convertTransform(com.bulletphysics.linearmath.Transform t) {
-        Transform tr = new Transform();
-        tr.setPos(new Vector3f(t.origin));
-        tr.setRot((Quaternion) t.getRotation(new Quaternion()));
-        return tr;
-    }
-    
 }

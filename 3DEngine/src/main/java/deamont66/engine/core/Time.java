@@ -34,6 +34,10 @@ public class Time
 {
 	private static final long SECOND = 1000000000L;
 
+        /**
+         * Returns time in seconds.
+         * @return 
+         */
 	public static double getTime()
 	{
 		return (double)System.nanoTime()/(double)SECOND;

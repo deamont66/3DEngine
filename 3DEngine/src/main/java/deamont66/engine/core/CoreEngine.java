@@ -27,7 +27,6 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.core;
 
 import deamont66.engine.rendering.Renderer;
@@ -35,33 +34,46 @@ import deamont66.engine.rendering.Window;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CoreEngine
-{
-	private boolean isRunning;
+public class CoreEngine {
+
+        /**
+         * Tells engine to render scene only if atleast one update processed for last frame.
+         * Caps framerate to updaterate.
+         */
+        private static final boolean RENDER_ONLY_WHILE_UPDATED = false;
         
-	private Game game;
+        private boolean isRunning;
+
+        private Game game;
         private Class<? extends Game> gameClass;
-        
-	private Class<? extends Renderer> rendererClass;
+
+        private Class<? extends Renderer> rendererClass;
         private Renderer renderer;
-        
-	private final int width;
-	private final int height;
-	private final double frameTime;
+
+        private final int width;
+        private final int height;
+        private final double updateTime;        // update time in sec
+        private final double fps_cap;           // time to render in sec
         private final boolean vsync;
-        
-        private int fps;
-	
-	public CoreEngine() {
-                this(640, 480, 60, false);
+
+        private int fps;                        // current fps value, default is framecap value
+
+        private final DebugTimer renderTimer = new DebugTimer("Render");
+        private final DebugTimer windowSyncTimer = new DebugTimer("Sync");
+        private final DebugTimer updateTimer = new DebugTimer("Update");
+        private final DebugTimer allTimer = new DebugTimer("Loop");
+
+        public CoreEngine() {
+                this(640, 480, 60, 120, false);
         }
 
-        public CoreEngine(int width, int height, double framerate, boolean vsync) {
+        public CoreEngine(int width, int height, double updatesPerSecond, double frame_cap, boolean vsync) {
                 this.isRunning = false;
                 this.width = width;
                 this.height = height;
-                this.fps = (int) framerate;
-                this.frameTime = 1.0 / framerate;
+                this.fps = (int) frame_cap;
+                this.fps_cap = 1.0 / frame_cap;
+                this.updateTime = 1.0 / updatesPerSecond;
                 this.vsync = vsync;
         }
 
@@ -88,106 +100,111 @@ public class CoreEngine
                 }
         }
 
-	public void start()
-	{
-		if(isRunning)
-			return;
-		
-		run();
-	}
-	
-	public void stop()
-	{
-		if(!isRunning)
-			return;
-		
-		isRunning = false;
-	}
-	
-	private void run()
-	{
-		isRunning = true;
-		
-		int frames = 0;
-		double frameCounter = 0;
+        public void start() {
+                if (isRunning) {
+                        return;
+                }
 
-		game.init();
+                run();
+        }
 
-		double lastTime = Time.getTime();
-		double unprocessedTime = 0;
-		
-		while(isRunning)
-		{
-			boolean render = false;
+        public void stop() {
+                if (!isRunning) {
+                        return;
+                }
 
-			double startTime = Time.getTime();
-			double passedTime = startTime - lastTime;
-			lastTime = startTime;
-			
-			unprocessedTime += passedTime;
-			frameCounter += passedTime;
-			
-			while(unprocessedTime > frameTime)
-			{
-				render = true;
-				
-				unprocessedTime -= frameTime;
-				
-				if(Window.isCloseRequested())
-					stop();
+                isRunning = false;
+        }
 
-				game.processInputAll((float)frameTime);
-				game.updateAll((float)frameTime);
+        private void run() {
+                isRunning = true;
+
+                int frames = 0;
+                double frameCounter = 0;
+
+                game.init();
+
+                double lastTime = Time.getTime();
+                double unprocessedTime = 0;
+                double renderTime = 0;
+
+                while (isRunning) {
+                        boolean render = !RENDER_ONLY_WHILE_UPDATED;
+
+                        double startTime = Time.getTime();
+                        double passedTime = startTime - lastTime;
+                        lastTime = startTime;
+
+                        unprocessedTime += passedTime;
+                        renderTime += passedTime;
+                        frameCounter += passedTime;
+
+                        while (unprocessedTime > updateTime) {
+                                render = true;
+
+                                unprocessedTime -= updateTime;
+
+                                if (Window.isCloseRequested()) {
+                                        stop();
+                                }
+
+                                updateTimer.start();
+                                game.processInputAll((float) updateTime);
+                                game.updateAll((float) updateTime);
                                 Input.update();
-				
-				if(frameCounter >= 1.0)
-				{
+                                updateTimer.stop();
+
+                                if (frameCounter >= 1.0) {
                                         fps = frames;
                                         frames = 0;
-					frameCounter = 0;
-				}
-			}
-			if(render)
-			{
-				game.renderAll(renderer);
-				Window.render();
-				frames++;
-			}
-			else
-			{
-				try
-				{
-					Thread.sleep(1);
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		cleanUp();
-	}
+                                        frameCounter = 0;
+                                        System.out.println("FPS: " + fps + "");
+                                }
+                        }
 
-	private void cleanUp()
-	{
+                        // game was updated so we want to re-render our scene
+                        if (render) {
+                                if (renderTime > fps_cap) {
+                                        renderTimer.start();
+                                        game.renderAll(renderer);
+                                        windowSyncTimer.start();
+                                        Window.render();
+                                        windowSyncTimer.stop();
+                                        renderTimer.stop();
+                                        frames++;
+
+                                        renderTime -= fps_cap;
+                                }
+                        } else {
+                                try {
+                                        Thread.sleep(1);
+                                } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                }
+                        }
+                }
+
+                cleanUp();
+        }
+
+        private void cleanUp() {
                 game.cleanUp();
                 Window.dispose();
-	}
+        }
 
-	public Renderer getRenderingEngine() {
-		return renderer;
-	}
+        public Renderer getRenderingEngine() {
+                return renderer;
+        }
 
         public int getFps() {
                 return fps;
         }
-        
+
         public void setGame(Class<? extends Game> aClass) {
-            gameClass = aClass;
+                gameClass = aClass;
         }
-        
+
         public void setRenderer(Class<? extends Renderer> aClass) {
-            rendererClass = aClass;
+                rendererClass = aClass;
         }
 }

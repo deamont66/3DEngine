@@ -27,28 +27,46 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-package deamont66.game;
+package deamont66.engine.core;
 
-import deamont66.engine.core.CoreEngine;
-import deamont66.engine.core.Debug;
-import deamont66.engine.rendering.LWJGLRenderer;
+/**
+ *
+ * @author JiriSimecek
+ */
+public class DebugTimer {
+    private double start = 0;
+    private double end   = 0;
+    private final String name;
 
-public class Main {
-
-    public static void main(String[] args) {
-        Debug.DEBUG_ECHO = true;
-        Debug.DEBUG_TIMERS_ECHO = false;
-        Debug.ENABLE_LIGHTS = true;
-        Debug.ENABLE_SHADOWS = false;
-        Debug.ENABLE_SHADERS = true;
-        Debug.ENABLE_NORMAL_MAP = true;
-        Debug.ENABLE_PARALLAX_MAP = true;
-        
-        CoreEngine engine = new CoreEngine(1280, 720, 60, 120, true);
-        engine.setRenderer(LWJGLRenderer.class);
-        engine.setGame(MyGame.class);
-        engine.createWindow();
-        engine.start();
-        System.exit(0);
+    public DebugTimer(String name) {
+        this.name = name;
+    }
+    
+    public void start() {
+        start = Time.getTime();
+    }
+    
+    public void stop() {
+        end = Time.getTime() - start;
+        if(Debug.DEBUG_TIMERS_ECHO) {
+            System.out.println(this.toString());
+        }
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * Returns time fo timer in seconds.
+     * @return 
+     */
+    public double getTime() {
+        return end;
+    }
+    
+    @Override
+    public String toString() {
+        return name + ": " + String.format("%.2f", (end * 1000)) + "ms";
     }
 }

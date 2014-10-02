@@ -39,128 +39,144 @@ import deamont66.engine.rendering.Window;
 
 public abstract class Game {
 
-    private Entity root;
-    private Nifty gui;
-    private LwjglInputSystem inputSystem;
-    private CoreEngine engine;
-    private GameState currentState;
+        private Scene scene;
+        private Nifty gui;
+        private LwjglInputSystem inputSystem;
+        private CoreEngine engine;
+        private GameState currentState;
 
-    public void setGameState(final Class<? extends GameState> state) {
-        try {
-            GameState newState = state.getConstructor(Game.class).newInstance(Game.this);
-            if (currentState != null) {
-                root = getRootObject(true);
-                engine.getRenderingEngine().clearLights();
-                currentState.cleanUp();
-            }
-            currentState = newState;
-            currentState.init();
-        } catch (Exception ex) {
-            System.err.println("Cannot change gameState to " + state.getName());
+        /**
+         * Change current gameState to given gameState class.
+         * @param state new state
+         */
+        public void setGameState(final Class<? extends GameState> state) {
+                try {
+                        GameState newState = state.getConstructor(Game.class).newInstance(Game.this);
+                        if (currentState != null) {
+                                scene = getSceneObject(true);
+                                engine.getRenderingEngine().clearLights();
+                                currentState.cleanUp();
+                        }
+                        currentState = newState;
+                        try {
+                                currentState.init();
+                        } catch (Exception e) {
+                                throw e;
+                        }
+                } catch (Exception ex) {
+                        throw new RuntimeException("Cannot change GameState to " + state.getName(), ex);
+                }
         }
-    }
 
-    protected void initGUI() {
-        inputSystem = new LwjglInputSystem();
-        try {
-            inputSystem.startup();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        /**
+         * Inits Nifty GUI classes and loads default styles for it.
+         * @see #getGui() 
+         */
+        protected void initGUI() {
+                inputSystem = new LwjglInputSystem();
+                try {
+                        inputSystem.startup();
+                } catch (Exception e) {
+                        throw new RuntimeException(e);
+                }
+                gui = new Nifty(
+                        new LwjglRenderDevice(),
+                        new NullSoundDevice(),
+                        inputSystem,
+                        new FastTimeProvider());
+                // load default styles
+                gui.loadStyleFile("nifty-default-styles.xml");
+                // load standard controls
+                gui.loadControlFile("nifty-default-controls.xml");
         }
-        gui = new Nifty(
-                new LwjglRenderDevice(),
-                new NullSoundDevice(),
-                inputSystem,
-                new FastTimeProvider());
-        // load default styles
-        gui.loadStyleFile("nifty-default-styles.xml");
-        // load standard controls
-        gui.loadControlFile("nifty-default-controls.xml");
-    }
 
-    protected void processInputAll(float delta) {
-        getRootObject().processInputAll(delta);
-        processInput(delta);
-        if (currentState != null) {
-            currentState.processInput(delta);
+        protected void processInputAll(float delta) {
+                getSceneObject().processInputAll(delta);
+                processInput(delta);
+                if (currentState != null) {
+                        currentState.processInput(delta);
+                }
         }
-    }
 
-    protected void updateAll(float delta) {
-        getRootObject().updateAll(delta);
-        if (gui != null) {
-            if (gui.update()) {
-                // nothing yet
-            }
+        protected void updateAll(float delta) {
+                getSceneObject().updateAll(delta);
+                if (gui != null) {
+                        if (gui.update()) {
+                                // nothing yet
+                        }
+                }
+                update(delta);
+                if (currentState != null) {
+                        currentState.update(delta);
+                }
         }
-        update(delta);
-        if (currentState != null) {
-            currentState.update(delta);
+
+        protected void renderAll(Renderer renderer) {
+                renderer.render(getSceneObject());
+                if (gui != null) {
+                        renderer.to2D(Window.getWidth(), Window.getHeight());
+                        try {
+                                gui.render(false);
+                        } catch (Exception e) {
+                        }
+                        renderer.backTo3D();
+                }
+                render(renderer);
+                if (currentState != null) {
+                        currentState.render(renderer);
+                }
         }
-    }
 
-    protected void renderAll(Renderer renderer) {
-        renderer.render(getRootObject());
-        if (gui != null) {
-            renderer.to2D(Window.getWidth(), Window.getHeight());
-            try {
-                gui.render(false);
-            } catch (Exception e) {
-            }
-            renderer.backTo3D();
+        public void cleanUp() {
+                inputSystem.shutdown();
+                if (currentState != null) {
+                        currentState.cleanUp();
+                }
         }
-        render(renderer);
-        if (currentState != null) {
-            currentState.render(renderer);
+
+        protected abstract void init();
+
+        protected abstract void processInput(float delta);
+
+        protected abstract void render(Renderer renderer);
+
+        protected abstract void update(float delta);
+
+        protected void addToScene(Entity object) {
+                getSceneObject().addChild(object);
         }
-    }
 
-    public void cleanUp() {
-        inputSystem.shutdown();
-        if (currentState != null) {
-            currentState.cleanUp();
+        /**
+         * Sets {@link CoreEngine} for root entity.
+         *
+         * @param engine
+         */
+        public void setEngine(CoreEngine engine) {
+                this.engine = engine;
+                getSceneObject().setEngine(engine);
         }
-    }
 
-    protected abstract void init();
-
-    protected abstract void processInput(float delta);
-
-    protected abstract void render(Renderer renderer);
-
-    protected abstract void update(float delta);
-
-    protected void addToScene(Entity object) {
-        getRootObject().addChild(object);
-    }
-
-    /**
-     * Sets {@link CoreEngine} for root entity.
-     *
-     * @param engine
-     */
-    public void setEngine(CoreEngine engine) {
-        this.engine = engine;
-        getRootObject().setEngine(engine);
-    }
-
-    public Nifty getGui() {
-        return gui;
-    }
-
-    public CoreEngine getEngine() {
-        return engine;
-    }
-
-    private Entity getRootObject() {
-        return getRootObject(root == null);
-    }
-
-    private Entity getRootObject(boolean reset) {
-        if (reset) {
-            root = new Entity();
-            root.setEngine(engine);
+        public Nifty getGui() {
+                return gui;
         }
-        return root;
-    }
+
+        public CoreEngine getEngine() {
+                return engine;
+        }
+
+        private Scene getSceneObject() {
+                return getSceneObject(scene == null);
+        }
+
+        private Scene getSceneObject(boolean reset) {
+                if (reset) {
+                        scene = new Scene();
+                        scene.setEngine(engine);
+                }
+                return scene;
+        }
+
+        protected void setCamera(Entity camera) {
+                scene.setCamera(camera);
+        }
 }

@@ -36,13 +36,13 @@ import deamont66.engine.components.PointLight;
 import deamont66.engine.core.Debug;
 import deamont66.engine.core.Entity;
 import static deamont66.engine.core.GlobalConstants.RENDER_LIGHT_RANGE;
+import deamont66.engine.core.Scene;
 import deamont66.engine.core.Transform;
 import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.core.math.Quaternion;
 import deamont66.engine.core.math.Vector3f;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -235,7 +235,7 @@ public class LWJGLRenderer extends Renderer {
     }
 
     @Override
-    public void render(Entity object) {
+    public void render(Scene object) {
 
 //        getTexture("displayTexture").bindAsRenderTarget();
         Window.bindAsRenderTarget();

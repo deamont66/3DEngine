@@ -31,7 +31,7 @@ package deamont66.engine.rendering;
 
 import deamont66.engine.components.BaseLight;
 import deamont66.engine.components.Camera;
-import deamont66.engine.core.Entity;
+import deamont66.engine.core.Scene;
 import deamont66.engine.core.Transform;
 import deamont66.engine.core.math.Matrix4f;
 import deamont66.engine.rendering.resourceManagement.MappedValues;
@@ -40,7 +40,7 @@ public abstract class Renderer extends MappedValues {
 
     public abstract void updateUniformStruct(Transform transform, Material material, Shader shader, String uniformName, String uniformType);
 
-    public abstract void render(Entity object);
+    public abstract void render(Scene object);
 
     public abstract String getRendererVersion();
 

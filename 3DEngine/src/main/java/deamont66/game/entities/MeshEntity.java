@@ -76,7 +76,7 @@ public class MeshEntity extends Entity {
      * @param sourceTransform 
      */
     public void updateTransform(com.bulletphysics.linearmath.Transform sourceTransform) {
-        updateTransform(sourceTransform, Vector3f.zeros(), Quaternion.noRotation());
+        updateTransform(sourceTransform, Vector3f.zero(), Quaternion.identity());
     }
     
     /**
@@ -85,7 +85,7 @@ public class MeshEntity extends Entity {
      * @param offset 
      */
     public void updateTransform(com.bulletphysics.linearmath.Transform sourceTransform, Vector3f offset) {
-        updateTransform(sourceTransform, offset, Quaternion.noRotation());
+        updateTransform(sourceTransform, offset, Quaternion.identity());
     }
     
     /**

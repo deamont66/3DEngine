@@ -29,7 +29,7 @@
  */
 package deamont66.game;
 
-import de.lessvoid.nifty.elements.render.TextRenderer;
+import de.lessvoid.nifty.controls.Label;
 import deamont66.engine.core.Game;
 import deamont66.engine.core.Input;
 import deamont66.engine.rendering.Renderer;
@@ -43,31 +43,34 @@ import org.lwjgl.LWJGLException;
  */
 public class MyGame extends Game {
 
-    @Override
-    public void init() {
-        Window.setTitle("Physics test");
-        initGUI();
-        getGui().fromXml("test.xml", "ingame");
-        setGameState(PhysicsTestState.class);
-    }
+      @Override
+      public void init() {
+            Window.setTitle("Physics test");
+            initGUI();
+            getGui().fromXml("test.xml", "ingame");
 
-    @Override
-    public void processInput(float delta) {
-        if (Input.getKeyDown(Input.KEY_F11)) {
-            try {
-                Window.setDisplayMode(Window.getWidth(), Window.getHeight(), !Window.isFullscreen());
-            } catch (LWJGLException ex) {
-                ex.printStackTrace();
+            setGameState(PhysicsTestState.class);
+      }
+
+      @Override
+      public void processInput(float delta) {
+            if (Input.getKeyDown(Input.KEY_F11)) {
+                  try {
+                        Window.setDisplayMode(Window.getWidth(), Window.getHeight(), !Window.isFullscreen());
+                  } catch (LWJGLException ex) {
+                        System.err.println("Error while changing window state: " + ex.getLocalizedMessage());
+                  }
             }
-        }
-    }
+      }
 
-    @Override
-    public void update(float delta) {
-        getGui().getCurrentScreen().findElementById("fps").getRenderer(TextRenderer.class).setText(getEngine().getFps() + " FPS");
-    }
+      @Override
+      public void update(float delta) {
+            Label label = getGui().getCurrentScreen().findNiftyControl("fpsLabel", Label.class);
+            label.setText(getEngine().getFps() + " FPS");
 
-    @Override
-    protected void render(Renderer renderer) {
-    }
+      }
+
+      @Override
+      protected void render(Renderer renderer) {
+      }
 }

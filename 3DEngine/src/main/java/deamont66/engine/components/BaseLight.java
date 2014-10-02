@@ -36,56 +36,60 @@ import deamont66.engine.rendering.Shader;
 import deamont66.engine.rendering.ShadowCameraTransform;
 import deamont66.engine.rendering.ShadowInfo;
 
+/**
+ *
+ * @author JiriSimecek
+ */
 public class BaseLight extends EntityComponent {
 
-	private Vector3f    m_color;
-	private float       m_intensity;
-	private Shader      m_shader;
-	private boolean     m_active;
-	private ShadowInfo  m_shadowInfo;
+        private final Vector3f color;
+        private final float intensity;
+        private final Shader shader;
+        private boolean active;
+        private ShadowInfo shadowInfo;
 
-	public BaseLight(Vector3f color, float intensity, Shader shader) {
-		this.m_color = color;
-		this.m_intensity = intensity;
-                this.m_shader = shader;
-		this.m_active = true;
-		this.m_shadowInfo = new ShadowInfo();
-	}
+        public BaseLight(Vector3f color, float intensity, Shader shader) {
+                this.color = color;
+                this.intensity = intensity;
+                this.shader = shader;
+                this.active = true;
+                this.shadowInfo = new ShadowInfo();
+        }
 
         public ShadowCameraTransform calcShadowCameraTransform(Vector3f mainCameraPos, Quaternion mainCameraRot) {
-            return new ShadowCameraTransform(getTransform().getTransformedPos(), getTransform().getTransformedRot());
+                return new ShadowCameraTransform(getTransform().getTransformedPos(), getTransform().getTransformedRot());
         }
-        
-	@Override
-	public void addToEngine(CoreEngine engine) {
-		engine.getRenderingEngine().addLight(this);
-	}
 
-	public Shader getShader() {
-		return m_shader;
-	}
+        @Override
+        public void addToEngine(CoreEngine engine) {
+                engine.getRenderingEngine().addLight(this);
+        }
 
-	public Vector3f getColor() {
-		return m_color;
-	}
+        public Shader getShader() {
+                return shader;
+        }
 
-	public float getIntensity() {
-		return m_intensity;
-	}
+        public Vector3f getColor() {
+                return color;
+        }
 
-	public boolean isActive() {
-		return m_active;
-	}
+        public float getIntensity() {
+                return intensity;
+        }
 
-	public void setActive(boolean active) {
-		this.m_active = active;
-	}
+        public boolean isActive() {
+                return active;
+        }
 
-	public ShadowInfo getShadowInfo() {
-		return m_shadowInfo;
-	}
+        public void setActive(boolean active) {
+                this.active = active;
+        }
 
-	protected void setShadowInfo(ShadowInfo shadowInfo) {
-		this.m_shadowInfo = shadowInfo;
-	}
+        public ShadowInfo getShadowInfo() {
+                return shadowInfo;
+        }
+
+        protected void setShadowInfo(ShadowInfo shadowInfo) {
+                this.shadowInfo = shadowInfo;
+        }
 }

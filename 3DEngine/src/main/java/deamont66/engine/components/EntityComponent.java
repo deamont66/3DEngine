@@ -27,7 +27,6 @@
  * either expressed or implied, of the FreeBSD Project.
  * 
  */
-
 package deamont66.engine.components;
 
 import deamont66.engine.core.CoreEngine;
@@ -36,24 +35,30 @@ import deamont66.engine.rendering.Renderer;
 import deamont66.engine.core.Transform;
 import deamont66.engine.rendering.Shader;
 
-public abstract class EntityComponent
-{
-	private Entity parent;
+public abstract class EntityComponent {
 
-	public void processInput(float delta) {}
-	public void update(float delta) {}
-	public void render(Shader shader, Renderer renderingEngine, Camera camera) {}
+        private Entity parent;
 
-	public void setParent(Entity parent)
-	{
-		this.parent = parent;
-	}
+        public void processInput(float delta) {
+        }
 
-	public Transform getTransform()
-	{
-		return parent.getTransform();
-	}
+        public void update(float delta) {
+        }
 
-	public void addToEngine(CoreEngine engine) {}
+        public void render(Shader shader, Renderer renderingEngine, Camera camera) {
+        }
+
+        public void setParent(Entity parent) {
+                this.parent = parent;
+        }
+
+        public Transform getTransform() {
+                if (parent != null) {
+                        return parent.getTransform();
+                }
+                return null;
+        }
+
+        public void addToEngine(CoreEngine engine) {
+        }
 }
-
